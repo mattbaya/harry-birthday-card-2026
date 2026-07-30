@@ -1142,13 +1142,33 @@
         }
 
         function updateConfetti(dt, t) {
-            // Keep a healthy number of falling particles
+            // Keep a healthy number of particles
             while (confetti.length < 180) {
                 spawnConfetti();
             }
 
+            // Count falling particles; if too few, recycle settled ones
+            let fallingCount = 0;
+            confetti.forEach(c => {
+                if (c.userData.state === 'falling') fallingCount++;
+            });
+            if (fallingCount < 80) {
+                const settled = confetti.filter(c => c.userData.state === 'settled');
+                // Recycle the ones that have been settled longest
+                settled.sort((a, b) => (b.userData.settledTime || 0) - (a.userData.settledTime || 0));
+                for (let i = 0; i < Math.min(10, settled.length); i++) {
+                    resetConfetti(settled[i]);
+                }
+            }
+
             confetti.forEach(c => {
                 const d = c.userData;
+                if (d.state === 'settled') {
+                    d.settledTime = (d.settledTime || 0) + dt;
+                } else {
+                    d.settledTime = 0;
+                }
+
                 if (d.state === 'falling') {
                     d.velocity.y -= 9.8 * dt * 0.3;
                     c.position.addScaledVector(d.velocity, dt);
