@@ -757,9 +757,14 @@
                             this.setState('grab_tile', 2);
                             break;
                         }
-                        const top = new THREE.Vector3(this.ladder.x, WOMBAT_MAX_Y, this.ladder.z);
-                        this.faceTarget(top, dt);
-                        if (this.moveToward(top, dt)) {
+                        // Rise straight up while aligning to ladder
+                        const climbSpeed = 4.0;
+                        this.position.y += climbSpeed * dt;
+                        this.position.x += (this.ladder.x - this.position.x) * 0.1;
+                        this.position.z += (this.ladder.z - this.position.z) * 0.1;
+                        this.faceTarget(new THREE.Vector3(this.ladder.x, WOMBAT_MAX_Y, this.ladder.z), dt);
+                        if (this.position.y >= WOMBAT_MAX_Y - 0.1) {
+                            this.position.y = WOMBAT_MAX_Y;
                             this.setState('grab_tile', 2);
                         }
                         break;
@@ -772,8 +777,12 @@
                                 this.carrying.userData.carrier = this;
                             }
                         }
+                        // Stay at top of ladder while grabbing
+                        this.position.x += (this.ladder.x - this.position.x) * 0.1;
+                        this.position.z += (this.ladder.z - this.position.z) * 0.1;
+                        this.position.y = WOMBAT_MAX_Y;
                         if (this.stateTimer <= 0) {
-                            this.setState('climb_down', 5);
+                            this.setState('climb_down', 6);
                         }
                         break;
                     }
@@ -785,9 +794,14 @@
                             this.setState('return', 10);
                             break;
                         }
-                        const bottom = new THREE.Vector3(this.ladder.x, WOMBAT_MIN_Y, this.ladder.z);
-                        this.faceTarget(bottom, dt);
-                        if (this.moveToward(bottom, dt)) {
+                        // Descend straight down while aligning to ladder
+                        const descendSpeed = 4.0;
+                        this.position.y -= descendSpeed * dt;
+                        this.position.x += (this.ladder.x - this.position.x) * 0.1;
+                        this.position.z += (this.ladder.z - this.position.z) * 0.1;
+                        this.faceTarget(new THREE.Vector3(this.ladder.x, WOMBAT_MIN_Y, this.ladder.z), dt);
+                        if (this.position.y <= WOMBAT_MIN_Y + 0.1) {
+                            this.position.y = WOMBAT_MIN_Y;
                             this.pickBurrowTarget();
                             this.setState('return', 10);
                         }
