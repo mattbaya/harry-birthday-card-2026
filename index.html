@@ -846,10 +846,13 @@
                     }
                 }
 
-                // Apply bounce / dance, clamped to floor/ladder range
-                const danceY = this.state === 'dance' ? Math.sin(this.dancePhase) * 0.5 : 0;
-                const baseY = Math.max(WOMBAT_MIN_Y, Math.min(WOMBAT_MAX_Y, this.position.y));
-                this.position.y = Math.max(WOMBAT_MIN_Y, Math.min(WOMBAT_MAX_Y, baseY + beatBounce + danceY));
+                // Clamp Y to floor/ladder range first
+                let baseY = Math.max(WOMBAT_MIN_Y, Math.min(WOMBAT_MAX_Y, this.position.y));
+                // Only add bounce/dance when on the ground; otherwise it fights descent/climb
+                const onGround = baseY <= WOMBAT_MIN_Y + 0.1;
+                const danceY = (onGround && this.state === 'dance') ? Math.sin(this.dancePhase) * 0.5 : 0;
+                const bounce = onGround ? beatBounce : 0;
+                this.position.y = Math.max(WOMBAT_MIN_Y, Math.min(WOMBAT_MAX_Y, baseY + bounce + danceY));
 
                 // Update mesh rotation: nose-first
                 this.mesh.rotation.z = this.facingAngle;
