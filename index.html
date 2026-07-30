@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <title>Happy 87th Birthday, Harry! | Harry's Boppers</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #050510;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: #fff;
+        }
+
+        #overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            background: rgba(0,0,0,0.7);
+            padding: 18px 22px;
+            border-radius: 12px;
+            max-width: 420px;
+            backdrop-filter: blur(4px);
+        }
+        #overlay h1 {
+            font-size: 1.25em;
+            color: #00d4aa;
+            margin-bottom: 6px;
+        }
+        #overlay p {
+            font-size: 0.85em;
+            color: #ccc;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        #controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        button {
+            background: #00d4aa;
+            color: #000;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        button:hover { background: #00ffcc; }
+        button:disabled { background: #555; color: #aaa; cursor: not-allowed; }
+
+        #seekBar {
+            flex: 1;
+            min-width: 120px;
+            accent-color: #00d4aa;
+        }
+
+        #timeDisplay {
+            font-family: monospace;
+            font-size: 0.85em;
+            color: #0f9;
+            min-width: 80px;
+            text-align: right;
+        }
+
+        #beatBar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(0,212,170,0.15);
+            z-index: 100;
+        }
+        #beatMarker {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 4px;
+            background: #00d4aa;
+            box-shadow: 0 0 10px #00d4aa;
+            transform: translateX(-50%);
+        }
+        #beatFlash {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(0,212,170,0.25) 0%, transparent 70%);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.05s ease-out;
+            z-index: 50;
+        }
+
+        #credit {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            color: #666;
+            font-size: 0.8em;
+            z-index: 100;
+        }
+        #credit a { color: #888; }
+
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #00d4aa;
+            font-size: 1.2em;
+            z-index: 200;
+        }
+
+        audio {
+            width: 100%;
+            margin-top: 10px;
+            opacity: 0.85;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading">Loading birthday surprise...</div>
+
+    <div id="overlay" style="display:none;">
+        <h1>Happy 87th Birthday, Harry!</h1>
+        <p>A little Boppers-style visual card with music. Press play to start the party.</p>
+        <div id="controls">
+            <button id="playBtn">▶ Play</button>
+            <input id="seekBar" type="range" min="0" max="100" value="0" step="0.1">
+            <span id="timeDisplay">0:00 / 0:16</span>
+        </div>
+        <audio id="boppersAudio" src="audio/happy-birthday-2026.mp3" preload="auto" controls loop></audio>
+    </div>
+
+    <div id="beatFlash"></div>
+    <div id="beatBar"><div id="beatMarker"></div></div>
+
+    <div id="credit">
+        <a href="index.html">Demo Gallery</a> |
+        <a href="https://boppers.net/boppers/">Harry's Boppers</a>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+    if (!window.THREE) {
+        const s = document.createElement('script');
+        s.src = 'lib/three.min.js';
+        document.head.appendChild(s);
+    }
+    </script>
+    <script src="lib/boppers-engine.js?v=8"></script>
+    <script src="lib/boppers-symbols.js?v=3"></script>
+    <script src="lib/STLLoader.js?v=1"></script>
+    <script src="https://unpkg.com/soundfont-player@0.12.0/dist/soundfont-player.min.js"></script>
+    <script>
+    const WEBGL_INSTRUCTIONS = 'Brave (and some privacy-hardened browsers) block WebGL by default.<br>'
+        + 'To see the 3D visuals, please:<br>'
+        + '1. Click the <b>Brave lion icon</b> in the address bar.<br>'
+        + '2. Set <b>Shields DOWN</b> for phred.boppers.net.<br>'
+        + '3. <a href="#" onclick="location.reload(true); return false;" style="color:#00d4aa;"><b>Reload this page</b></a>.<br><br>'
+        + 'Or open the demo in Chrome, where it works without changing shields.';
+
+    function showFatal(msg, isWebGL) {
+        const overlay = document.getElementById('overlay');
+        const loading = document.getElementById('loading');
+        if (overlay) {
+            overlay.style.display = 'block';
+            overlay.innerHTML = '<h1>' + msg + '</h1><p>' + (isWebGL ? WEBGL_INSTRUCTIONS : 'Please reload the page or try Chrome.') + '</p>';
+        }
+        if (loading) loading.style.display = 'none';
+    }
+    function isWebGLError(msg) {
+        return /webgl/i.test(msg || '');
+    }
+    function formatTime(sec) {
+        const s = Math.max(0, Math.floor(sec || 0));
+        const m = Math.floor(s / 60);
+        const rs = s % 60;
+        return m + ':' + (rs < 10 ? '0' : '') + rs;
+    }
+    window.addEventListener('error', (e) => showFatal('Runtime error: ' + e.message, isWebGLError(e.message)));
+    window.addEventListener('unhandledrejection', (e) => {
+        const reason = e.reason && e.reason.message ? e.reason.message : String(e.reason);
+        showFatal('Unhandled error: ' + reason, isWebGLError(reason));
+    });
+
+    // SoundfontPlayer: real instrument samples via Web Audio API
+    class SoundfontPlayer {
+        constructor(notesUrl) {
+            this.notesUrl = notesUrl;
+            this.notes = [];
+            this.instruments = {};
+            this.loaded = false;
+            this.isPlaying = false;
+            this.audioContext = null;
+            this.startTime = 0;
+            this.pauseTime = 0;
+            this.duration = 38.5;
+            this.scheduledUpTo = -1;
+        }
+
+        async init() {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            this.audioContext = new AudioContext();
+            const res = await fetch(this.notesUrl);
+            const data = await res.json();
+            this.notes = data.notes || [];
+            this.duration = data.duration || 38.5;
+            const uniqueInstruments = [...new Set(this.notes.map(n => n.instrument))];
+            for (const inst of uniqueInstruments) {
+                try {
+                    this.instruments[inst] = await Soundfont.instrument(this.audioContext, inst, {
+                        soundfont: 'FluidR3_GM',
+                        format: 'mp3'
+                    });
+                } catch (err) {
+                    console.warn('Could not load instrument', inst, err);
+                }
+            }
+            this.loaded = true;
+        }
+
+        play() {
+            if (!this.loaded || !this.audioContext) return;
+            if (this.audioContext.state === 'suspended') {
+                this.audioContext.resume();
+            }
+            this.isPlaying = true;
+            this.startTime = this.audioContext.currentTime - this.pauseTime;
+            this.scheduledUpTo = this.pauseTime;
+        }
+
+        pause() {
+            this.isPlaying = false;
+            this.pauseTime = this.currentTime;
+            if (this.audioContext) {
+                this.audioContext.suspend();
+            }
+        }
+
+        seek(time) {
+            this.pauseTime = Math.max(0, Math.min(this.duration, time));
+            this.scheduledUpTo = this.pauseTime - 1;
+            if (this.isPlaying) {
+                this.startTime = this.audioContext.currentTime - this.pauseTime;
+            }
+        }
+
+        get currentTime() {
+            if (this.isPlaying && this.audioContext) {
+                return this.audioContext.currentTime - this.startTime;
+            }
+            return this.pauseTime;
+        }
+
+        schedule() {
+            if (!this.isPlaying || !this.loaded) return;
+            const now = this.currentTime;
+            const lookahead = 1.5;
+            if (this.scheduledUpTo < now + lookahead) {
+                const from = Math.max(now, this.scheduledUpTo);
+                const to = now + lookahead;
+                for (const note of this.notes) {
+                    if (note.start >= from && note.start < to) {
+                        const inst = this.instruments[note.instrument];
+                        if (inst) {
+                            const when = this.startTime + note.start;
+                            inst.play(note.note, when, {
+                                duration: note.duration,
+                                gain: note.velocity * 0.8
+                            });
+                        }
+                    }
+                }
+                this.scheduledUpTo = to;
+            }
+        }
+    }
+
+    (async function() {
+        try {
+        const scene = new BoppersScene({ cameraZ: 34, cameraY: 5, background: 0x0a0a20 });
+        scene.scene.background = new THREE.Color(0x050510);
+
+        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x4444ff, 0.7);
+        scene.scene.add(hemiLight);
+        const rimLight = new THREE.DirectionalLight(0x00d4aa, 0.9);
+        rimLight.position.set(-10, 10, -10);
+        scene.scene.add(rimLight);
+        const fillLight = new THREE.PointLight(0xffaa55, 0.7, 80);
+        fillLight.position.set(0, 14, 14);
+        scene.scene.add(fillLight);
+
+        const clock = new BoppersClock();
+        let lastFrameTime = clock.now();
+
+        // Audio: BoppersPlayer drives timing/analyzer; SoundfontPlayer provides real samples
+        const audioEl = document.getElementById('boppersAudio');
+        audioEl.volume = 0;
+        audioEl.muted = true;
+        const player = new BoppersPlayer('audio/happy-birthday-2026.mp3', { audioElement: audioEl });
+        const analyzer = new BoppersAudioAnalyzer(player, { smoothing: 0.75 });
+        const sfPlayer = new SoundfontPlayer('audio/happy-birthday-2026-notes.json');
+        try {
+            await sfPlayer.init();
+        } catch (e) {
+            console.warn('Could not init soundfont player', e);
+        }
+        let beatTimes = [];
+        let nextBeatIndex = 0;
+        try {
+            const timing = await fetch('audio/happy-birthday-2026-timing.json').then(r => r.json());
+            beatTimes = timing.beats || [];
+        } catch (e) {
+            console.warn('Could not load timing', e);
+        }
+
+        // Sound bars
+        const BAR_COUNT = 16;
+        const soundBars = [];
+        const barGeo = new THREE.BoxGeometry(1.4, 1, 1.4);
+        for (let i = 0; i < BAR_COUNT; i++) {
+            const barMat = new THREE.MeshBasicMaterial({
+                color: new THREE.Color().setHSL(0.15 + (i / BAR_COUNT) * 0.35, 0.9, 0.5),
+                transparent: true,
+                opacity: 0.6
+            });
+            const bar = new THREE.Mesh(barGeo, barMat);
+            bar.position.set(-16 + i * 2.1, -7, -24);
+            scene.scene.add(bar);
+            soundBars.push(bar);
+        }
+
+        // Letter tiles — cubes with letter textures
+        const letters = [];
+
+        function createLetterTexture(char, color) {
+            const size = 256;
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            // Background
+            ctx.fillStyle = color;
+            ctx.fillRect(0, 0, size, size);
+            // Slight inner glow/shadow
+            ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+            ctx.lineWidth = 8;
+            ctx.strokeRect(8, 8, size - 16, size - 16);
+            // Letter
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 160px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(char, size / 2, size / 2 + 10);
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.needsUpdate = true;
+            return tex;
+        }
+
+        function makeLetterTile(char, color, x, y, z, idx) {
+            const size = 2.0;
+            const geometry = new THREE.BoxGeometry(size, size, size);
+            const tex = createLetterTexture(char, color);
+            const sideMat = new THREE.MeshStandardMaterial({ color: new THREE.Color(color), roughness: 0.4, metalness: 0.1 });
+            const faceMat = new THREE.MeshStandardMaterial({
+                map: tex,
+                color: 0xffffff,
+                roughness: 0.4,
+                metalness: 0.1,
+                emissive: new THREE.Color(color),
+                emissiveIntensity: 0.3
+            });
+            // Box materials: right, left, top, bottom, front, back
+            const materials = [sideMat, sideMat, sideMat, sideMat, faceMat, faceMat];
+            const cube = new THREE.Mesh(geometry, materials);
+            cube.position.set(x, y, z);
+            cube.userData = {
+                home: new THREE.Vector3(x, y, z),
+                current: new THREE.Vector3(x, y, z),
+                idx: idx,
+                phase: idx * 0.3,
+                state: 'home',
+                carrier: null,
+                storedIn: null
+            };
+            scene.root.add(cube);
+            return cube;
+        }
+
+        function layoutWord(text, color, y, z) {
+            const spacing = 2.4;
+            const totalWidth = (text.length - 1) * spacing;
+            for (let i = 0; i < text.length; i++) {
+                const ch = text[i];
+                if (ch === ' ') continue;
+                const x = i * spacing - totalWidth / 2;
+                const tile = makeLetterTile(ch, color, x, y, z, letters.length);
+                letters.push(tile);
+            }
+        }
+
+        layoutWord('HAPPY', '#00d4aa', 7, 0);
+        layoutWord('87TH', '#ffd700', 3, 0);
+        layoutWord('BIRTHDAY', '#e94560', -1, 0);
+        layoutWord('HARRY', '#4285f4', -5, 0);
+
+        // Ladders — start off-screen; wombats carry them in and set them up
+        const ladders = [];
+        const LADDER_BOTTOM = -6;
+        const LADDER_TOP = 7;
+        const LADDER_STASH = { x: 35, z: 25 };
+
+        function makeLadder(x, z) {
+            const group = new THREE.Group();
+            const railGeo = new THREE.CylinderGeometry(0.06, 0.06, LADDER_TOP - LADDER_BOTTOM, 8);
+            const railMat = new THREE.MeshStandardMaterial({ color: 0x8d6e63 });
+            const leftRail = new THREE.Mesh(railGeo, railMat);
+            leftRail.position.set(-0.35, (LADDER_TOP + LADDER_BOTTOM) / 2, 0);
+            const rightRail = new THREE.Mesh(railGeo, railMat);
+            rightRail.position.set(0.35, (LADDER_TOP + LADDER_BOTTOM) / 2, 0);
+            group.add(leftRail);
+            group.add(rightRail);
+            const rungCount = Math.max(3, Math.floor((LADDER_TOP - LADDER_BOTTOM) / 0.5));
+            const rungGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.7, 8);
+            for (let i = 0; i < rungCount; i++) {
+                const rung = new THREE.Mesh(rungGeo, railMat);
+                rung.rotation.z = Math.PI / 2;
+                rung.position.set(0, LADDER_BOTTOM + (i + 0.5) * ((LADDER_TOP - LADDER_BOTTOM) / rungCount), 0);
+                group.add(rung);
+            }
+            group.position.set(LADDER_STASH.x, 0, LADDER_STASH.z);
+            group.visible = false;
+            scene.root.add(group);
+            const ladder = { group, x, z, placed: false, carriedBy: null };
+            ladders.push(ladder);
+            return ladder;
+        }
+
+        // Create needed ladder slots near each column of high letters
+        const highXs = new Set();
+        letters.forEach(l => {
+            if (l.userData.home.y >= 6) highXs.add(l.userData.home.x);
+        });
+        highXs.forEach(x => makeLadder(x, 2.5));
+
+        function findUnplacedLadderNeed() {
+            return ladders.find(l => !l.placed && !l.carriedBy);
+        }
+
+        function nearestLadderToTile(tile) {
+            let best = null;
+            let bestD = Infinity;
+            ladders.forEach(l => {
+                if (!l.placed) return;
+                const d = Math.abs(l.x - tile.userData.home.x) + Math.abs(l.z - tile.userData.home.z);
+                if (d < bestD) {
+                    bestD = d;
+                    best = l;
+                }
+            });
+            return best;
+        }
+
+        // Confetti
+        const confetti = [];
+        const FLOOR_Y = -6.0;
+        const WOMBAT_MIN_Y = -5.5;
+        const WOMBAT_MAX_Y = 5.5;
+        const colors = [0x00d4aa, 0xe94560, 0xfbbc04, 0x4285f4, 0x9c27b0];
+        const confettiGeo = new THREE.BoxGeometry(0.3, 0.3, 0.3);
+        function spawnConfetti() {
+            const mat = new THREE.MeshPhongMaterial({ color: colors[Math.floor(Math.random() * colors.length)] });
+            const mesh = new THREE.Mesh(confettiGeo, mat);
+            mesh.position.set(
+                (Math.random() - 0.5) * 50,
+                12 + Math.random() * 8,
+                (Math.random() - 0.5) * 25 - 5
+            );
+            mesh.userData = {
+                state: 'falling',
+                velocity: new THREE.Vector3((Math.random() - 0.5) * 0.5, -(0.5 + Math.random() * 1.5), (Math.random() - 0.5) * 0.5),
+                rotSpeed: (Math.random() - 0.5) * 0.2,
+                wobble: Math.random() * Math.PI * 2,
+                settleOffset: Math.random() * 0.2
+            };
+            scene.root.add(mesh);
+            confetti.push(mesh);
+        }
+        for (let i = 0; i < 120; i++) spawnConfetti();
+
+        // Floor glow ring
+        const ringGeo = new THREE.RingGeometry(3.5, 3.9, 64);
+        const ringMat = new THREE.MeshBasicMaterial({ color: 0x00d4aa, side: THREE.DoubleSide });
+        const ring = new THREE.Mesh(ringGeo, ringMat);
+        ring.rotation.x = -Math.PI / 2;
+        ring.position.set(0, -6.2, 0);
+        scene.root.add(ring);
+
+        // Ground plane
+        const groundGeo = new THREE.PlaneGeometry(120, 80);
+        const groundMat = new THREE.MeshStandardMaterial({ color: 0x0a0a18, roughness: 1.0, metalness: 0.0 });
+        const ground = new THREE.Mesh(groundGeo, groundMat);
+        ground.rotation.x = -Math.PI / 2;
+        ground.position.y = -6.25;
+        scene.root.add(ground);
+
+        // Beat rings pool
+        const beatRings = [];
+        const ringPool = [];
+        function spawnBeatRing(x, z, color) {
+            let br;
+            if (ringPool.length) {
+                br = ringPool.pop();
+                br.mesh.visible = true;
+                br.mesh.material.color.set(color || 0xffd700);
+            } else {
+                const geo = new THREE.RingGeometry(0.3, 0.5, 64);
+                const mat = new THREE.MeshBasicMaterial({ color: color || 0xffd700, transparent: true, opacity: 0.85, side: THREE.DoubleSide });
+                br = { mesh: new THREE.Mesh(geo, mat) };
+                br.mesh.rotation.x = -Math.PI / 2;
+                scene.root.add(br.mesh);
+            }
+            br.mesh.position.set(x || 0, -6.15, z || 0);
+            br.mesh.scale.set(1, 1, 1);
+            br.mesh.material.opacity = 0.85;
+            br.birth = player.currentTime;
+            beatRings.push(br);
+        }
+
+        // Burrows — real holes that things sink into
+        const burrows = [];
+        function makeBurrow(x, z, idx) {
+            const group = new THREE.Group();
+            // Dark pit cylinder going below floor
+            const pitGeo = new THREE.CylinderGeometry(1.6, 1.4, 3, 32, 1, true);
+            const pitMat = new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.DoubleSide });
+            const pit = new THREE.Mesh(pitGeo, pitMat);
+            pit.position.y = -7.7;
+            group.add(pit);
+            // Dirt rim
+            const rimGeo = new THREE.RingGeometry(1.6, 2.2, 32);
+            const rimMat = new THREE.MeshBasicMaterial({ color: 0x5d4037, side: THREE.DoubleSide });
+            const rim = new THREE.Mesh(rimGeo, rimMat);
+            rim.rotation.x = -Math.PI / 2;
+            rim.position.y = -6.2;
+            rim.scale.set(0, 0, 0);
+            group.add(rim);
+            // Mound around rim
+            const moundGeo = new THREE.TorusGeometry(1.9, 0.25, 8, 32);
+            const moundMat = new THREE.MeshStandardMaterial({ color: 0x6d4c41, roughness: 1.0 });
+            const mound = new THREE.Mesh(moundGeo, moundMat);
+            mound.rotation.x = -Math.PI / 2;
+            mound.position.y = -6.2;
+            mound.scale.set(0, 0, 0);
+            group.add(mound);
+
+            group.position.set(x, 0, z);
+            scene.root.add(group);
+            const burrow = {
+                group, pit, rim, mound,
+                x, z,
+                dug: false,
+                stored: [],
+                opening: null,
+                idx
+            };
+            burrows.push(burrow);
+            return burrow;
+        }
+
+        // Wombat class
+        class Wombat {
+            constructor(sceneRoot, geometry, baseScale, color, idx) {
+                this.idx = idx;
+                this.color = color;
+                const material = new THREE.MeshStandardMaterial({
+                    color: color,
+                    roughness: 0.95,
+                    metalness: 0.05
+                });
+                this.mesh = new THREE.Mesh(geometry, material);
+                this.mesh.scale.set(baseScale, baseScale, baseScale);
+                this.mesh.position.set(0, -5.5, 4);
+                this.mesh.rotation.x = -Math.PI / 2;
+                sceneRoot.add(this.mesh);
+
+                this.position = this.mesh.position;
+                this.facingAngle = Math.random() * Math.PI * 2;
+                this.state = 'wander';
+                this.stateTimer = 0;
+                this.target = new THREE.Vector3();
+                this.carrying = null;
+                this.burrow = null;
+                this.homeBurrow = null;
+                this.digSpot = null;
+                this.ladder = null;
+                this.ladderToPlace = null;
+                this.ladderTargetX = 0;
+                this.ladderTargetZ = 0;
+                this.dancePhase = Math.random() * Math.PI * 2;
+                this.speed = 2.5 + Math.random() * 1.5;
+                this.turnSpeed = 4.0;
+                this.bobOffset = Math.random() * Math.PI;
+                this.pickNewTarget();
+            }
+
+            pickNewTarget() {
+                const angle = Math.random() * Math.PI * 2;
+                const radius = 3 + Math.random() * 12;
+                this.target.set(Math.cos(angle) * radius, -5.5, Math.sin(angle) * radius);
+            }
+
+            nearestHomeTile(requireHigh) {
+                let best = null;
+                let bestD = Infinity;
+                letters.forEach(tile => {
+                    if (tile.userData.state !== 'home') return;
+                    if (requireHigh && tile.userData.home.y < 4) return;
+                    if (!requireHigh && tile.userData.home.y >= 4) return;
+                    const d = tile.position.distanceTo(this.position);
+                    if (d < bestD && d < 25) {
+                        bestD = d;
+                        best = tile;
+                    }
+                });
+                return best;
+            }
+
+
+
+            setState(newState, duration) {
+                this.state = newState;
+                this.stateTimer = duration || (2 + Math.random() * 2);
+            }
+
+            faceTarget(target, dt) {
+                const dx = target.x - this.position.x;
+                const dz = target.z - this.position.z;
+                const targetAngle = Math.atan2(dx, dz);
+                let diff = targetAngle - this.facingAngle;
+                while (diff > Math.PI) diff -= Math.PI * 2;
+                while (diff < -Math.PI) diff += Math.PI * 2;
+                this.facingAngle += diff * Math.min(1, this.turnSpeed * dt);
+            }
+
+            moveForward(dt) {
+                this.position.x += Math.sin(this.facingAngle) * this.speed * dt;
+                this.position.z += Math.cos(this.facingAngle) * this.speed * dt;
+            }
+
+            moveToward(target, dt) {
+                const dx = target.x - this.position.x;
+                const dy = target.y - this.position.y;
+                const dz = target.z - this.position.z;
+                const flatDist = Math.sqrt(dx * dx + dz * dz);
+                if (flatDist < 0.2 && Math.abs(dy) < 0.2) return true;
+
+                // Always face the horizontal target
+                this.faceTarget(target, dt);
+
+                // Move forward
+                const step = this.speed * dt;
+                if (flatDist > 0.2) {
+                    this.position.x += Math.sin(this.facingAngle) * step;
+                    this.position.z += Math.cos(this.facingAngle) * step;
+                }
+                // Climb vertically if needed
+                if (Math.abs(dy) > 0.1) {
+                    this.position.y += Math.sign(dy) * Math.min(Math.abs(dy), step);
+                }
+                return false;
+            }
+
+            update(dt, t, isPlaying) {
+                // Dance bounce on beats
+                const beatBounce = isPlaying ? Math.abs(Math.sin(t * Math.PI * 4 + this.bobOffset)) * 0.2 : 0;
+
+                switch (this.state) {
+                    case 'wander': {
+                        if (this.moveToward(this.target, dt)) {
+                            this.chooseNextActivity(t);
+                        }
+                        break;
+                    }
+                    case 'dig': {
+                        this.dig(dt, t);
+                        break;
+                    }
+                    case 'fetch_ladder': {
+                        const stash = new THREE.Vector3(LADDER_STASH.x, -5.5, LADDER_STASH.z);
+                        if (this.moveToward(stash, dt)) {
+                            if (this.ladderToPlace && !this.ladderToPlace.carriedBy && !this.ladderToPlace.placed) {
+                                this.ladderToPlace.carriedBy = this;
+                                this.ladderToPlace.group.visible = true;
+                            }
+                            this.setState('carry_ladder', 12);
+                        }
+                        break;
+                    }
+                    case 'carry_ladder': {
+                        if (!this.ladderToPlace || !this.ladderToPlace.group.visible) {
+                            this.setState('wander', 3);
+                            break;
+                        }
+                        this.target.set(this.ladderTargetX, -5.5, this.ladderTargetZ);
+                        if (this.moveToward(this.target, dt)) {
+                            this.setState('place_ladder', 2);
+                        }
+                        break;
+                    }
+                    case 'place_ladder': {
+                        if (this.ladderToPlace) {
+                            this.ladderToPlace.x = this.ladderTargetX;
+                            this.ladderToPlace.z = this.ladderTargetZ;
+                            this.ladderToPlace.group.position.set(this.ladderTargetX, 0, this.ladderTargetZ);
+                            this.ladderToPlace.group.rotation.set(0, 0, 0);
+                            this.ladderToPlace.placed = true;
+                            this.ladderToPlace.carriedBy = null;
+                            this.ladderToPlace.group.visible = true;
+                            this.ladder = this.ladderToPlace;
+                            this.ladderToPlace = null;
+                        }
+                        this.setState('goto_ladder', 8);
+                        break;
+                    }
+                    case 'goto_ladder': {
+                        if (this.ladder) {
+                            const base = new THREE.Vector3(this.ladder.x, -5.5, this.ladder.z);
+                            if (this.moveToward(base, dt)) {
+                                this.setState('climb_up', 4);
+                            }
+                        } else {
+                            this.setState('wander', 3);
+                        }
+                        break;
+                    }
+                    case 'climb_up': {
+                        if (!this.ladder) { this.setState('wander', 3); break; }
+                        if (this.stateTimer <= 0) {
+                            this.position.y = WOMBAT_MAX_Y;
+                            this.setState('grab_tile', 2);
+                            break;
+                        }
+                        const top = new THREE.Vector3(this.ladder.x, WOMBAT_MAX_Y, this.ladder.z);
+                        this.faceTarget(top, dt);
+                        if (this.moveToward(top, dt)) {
+                            this.setState('grab_tile', 2);
+                        }
+                        break;
+                    }
+                    case 'grab_tile': {
+                        if (!this.carrying) {
+                            this.carrying = this.targetTile;
+                            if (this.carrying) {
+                                this.carrying.userData.state = 'carried';
+                                this.carrying.userData.carrier = this;
+                            }
+                        }
+                        if (this.stateTimer <= 0) {
+                            this.setState('climb_down', 5);
+                        }
+                        break;
+                    }
+                    case 'climb_down': {
+                        if (!this.ladder) { this.setState('wander', 3); break; }
+                        if (this.stateTimer <= 0 || this.position.y <= WOMBAT_MIN_Y + 0.1) {
+                            this.position.y = WOMBAT_MIN_Y;
+                            this.pickBurrowTarget();
+                            this.setState('return', 10);
+                            break;
+                        }
+                        const bottom = new THREE.Vector3(this.ladder.x, WOMBAT_MIN_Y, this.ladder.z);
+                        this.faceTarget(bottom, dt);
+                        if (this.moveToward(bottom, dt)) {
+                            this.pickBurrowTarget();
+                            this.setState('return', 10);
+                        }
+                        break;
+                    }
+                    case 'steal_floor': {
+                        if (!this.carrying || !this.carrying.parent) {
+                            this.carrying = this.nearestHomeTile(false);
+                            if (!this.carrying) { this.setState('wander', 3); break; }
+                            this.carrying.userData.state = 'carried';
+                            this.carrying.userData.carrier = this;
+                        }
+                        const targetPos = this.carrying.position.clone();
+                        targetPos.y = -5.5;
+                        if (this.moveToward(targetPos, dt)) {
+                            this.pickBurrowTarget();
+                            this.setState('return', 10);
+                        }
+                        break;
+                    }
+                    case 'return': {
+                        if (!this.carrying || !this.carrying.parent) {
+                            this.setState('wander', 3);
+                            break;
+                        }
+                        if (this.moveToward(this.target, dt)) {
+                            this.setState('drop', 1.5);
+                        }
+                        break;
+                    }
+                    case 'drop': {
+                        this.dropTile();
+                        this.setState('wander', 3);
+                        break;
+                    }
+                    case 'dance': {
+                        this.dancePhase += dt * 10;
+                        if (this.stateTimer <= 0) {
+                            this.setState('wander', 3);
+                        }
+                        break;
+                    }
+                }
+
+                // Apply bounce / dance, clamped to floor/ladder range
+                const danceY = this.state === 'dance' ? Math.sin(this.dancePhase) * 0.5 : 0;
+                const baseY = Math.max(WOMBAT_MIN_Y, Math.min(WOMBAT_MAX_Y, this.position.y));
+                this.position.y = Math.max(WOMBAT_MIN_Y, Math.min(WOMBAT_MAX_Y, baseY + beatBounce + danceY));
+
+                // Update mesh rotation: nose-first
+                this.mesh.rotation.z = this.facingAngle;
+
+                // Carried ladder (horizontal, in front)
+                if (this.ladderToPlace && this.ladderToPlace.group.visible) {
+                    const forward = new THREE.Vector3(Math.sin(this.facingAngle), 0, Math.cos(this.facingAngle));
+                    const carryPos = this.position.clone().add(forward.multiplyScalar(2.0)).add(new THREE.Vector3(0, 0.4, 0));
+                    this.ladderToPlace.group.position.copy(carryPos);
+                    // Ladder lies horizontally, pointing forward
+                    this.ladderToPlace.group.rotation.set(0, -this.facingAngle, Math.PI / 2);
+                }
+
+                // Carried tile sticks out front horizontally like it's in the mouth
+                if (this.carrying && this.carrying.parent) {
+                    const forward = new THREE.Vector3(Math.sin(this.facingAngle), 0, Math.cos(this.facingAngle));
+                    const mouthPos = this.position.clone().add(forward.multiplyScalar(1.6)).add(new THREE.Vector3(0, 0.2, 0));
+                    this.carrying.position.copy(mouthPos);
+                    this.carrying.rotation.set(0, -this.facingAngle, 0);
+                    this.carrying.userData.current.copy(mouthPos);
+                }
+
+                this.stateTimer -= dt;
+            }
+
+            chooseNextActivity(t) {
+                const r = Math.random();
+                // Dig a new burrow ~20%
+                if (r < 0.20 && burrows.length < 5) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const radius = 12 + Math.random() * 4;
+                    this.digSpot = { x: Math.cos(angle) * radius, z: Math.sin(angle) * radius };
+                    this.target.set(this.digSpot.x, -5.5, this.digSpot.z);
+                    this.setState('dig', 4);
+                    return;
+                }
+                // Steal a high letter with ladder ~25%
+                if (r < 0.45) {
+                    const tile = this.nearestHomeTile(true);
+                    if (tile) {
+                        this.targetTile = tile;
+                        const placedLadder = nearestLadderToTile(tile);
+                        if (!placedLadder) {
+                            // Need to fetch and place a ladder first
+                            const need = findUnplacedLadderNeed();
+                            if (need) {
+                                this.ladderToPlace = need;
+                                this.ladderTargetX = tile.userData.home.x;
+                                this.ladderTargetZ = 2.5;
+                                if (!this.homeBurrow) this.ensureHomeBurrow();
+                                this.burrow = this.homeBurrow;
+                                this.setState('fetch_ladder', 12);
+                                return;
+                            }
+                        } else {
+                            this.ladder = placedLadder;
+                            if (!this.homeBurrow) this.ensureHomeBurrow();
+                            this.burrow = this.homeBurrow;
+                            this.setState('goto_ladder', 8);
+                            return;
+                        }
+                    }
+                }
+                // Steal a floor letter ~25%
+                if (r < 0.70) {
+                    const tile = this.nearestHomeTile(false);
+                    if (tile) {
+                        this.targetTile = tile;
+                        if (!this.homeBurrow) this.ensureHomeBurrow();
+                        this.burrow = this.homeBurrow;
+                        this.setState('steal_floor', 8);
+                        return;
+                    }
+                }
+                // Dance ~15%
+                if (r < 0.85 && t > 0) {
+                    this.setState('dance', 2 + Math.random() * 2);
+                    return;
+                }
+                // Wander
+                this.pickNewTarget();
+                this.setState('wander', 4 + Math.random() * 3);
+            }
+
+            ensureHomeBurrow() {
+                if (this.homeBurrow) return;
+                const existing = burrows.find(b => !b.dug);
+                if (existing) {
+                    this.homeBurrow = existing;
+                } else {
+                    const angle = this.idx * 1.5;
+                    this.homeBurrow = makeBurrow(10 + Math.cos(angle) * 6, Math.sin(angle) * 6, burrows.length);
+                }
+            }
+
+            pickBurrowTarget() {
+                const b = this.burrow || this.homeBurrow;
+                if (!b) {
+                    this.pickNewTarget();
+                    return;
+                }
+                this.target.set(b.x + (Math.random() - 0.5) * 1.2, -5.5, b.z + (Math.random() - 0.5) * 1.2);
+            }
+
+            dig(dt, t) {
+                if (this.digSpot) {
+                    const spot = new THREE.Vector3(this.digSpot.x, -5.5, this.digSpot.z);
+                    if (this.moveToward(spot, dt)) {
+                        // Dig animation
+                        this.position.y = -5.5 + Math.abs(Math.sin(t * 15)) * 0.4;
+                        this.mesh.rotation.z += Math.sin(t * 20) * 0.1;
+                        if (this.stateTimer <= 2.0 && this.digSpot) {
+                            const b = makeBurrow(this.digSpot.x, this.digSpot.z, burrows.length);
+                            b.dug = true;
+                            b.opening = 0;
+                            this.homeBurrow = b;
+                            this.burrow = b;
+                            this.digSpot = null;
+                        }
+                    }
+                } else {
+                    this.setState('wander', 3);
+                }
+            }
+
+            dropTile() {
+                if (!this.carrying || !this.carrying.parent) return;
+                const b = this.burrow || this.homeBurrow;
+                if (b) {
+                    b.stored.push(this.carrying);
+                    this.carrying.userData.state = 'stored';
+                    this.carrying.userData.storedIn = b;
+                    this.carrying.userData.carrier = null;
+                    // Sink into hole
+                    const angle = b.stored.length * 0.7;
+                    const r = 0.8 + Math.random() * 0.4;
+                    this.carrying.position.set(
+                        b.x + Math.cos(angle) * r,
+                        -7.5 - b.stored.length * 0.25,
+                        b.z + Math.sin(angle) * r
+                    );
+                    this.carrying.rotation.set(Math.PI / 2, angle, 0);
+                }
+                this.carrying = null;
+            }
+        }
+
+        const wombats = [];
+        const wombatColors = [0x5d4037, 0x795548, 0x4e342e, 0x6d4c41];
+
+        // Load the real wombat STL and spawn the troupe
+        const loader = new THREE.STLLoader();
+        loader.load('models/wombat.stl', function(geometry) {
+            geometry.computeBoundingBox();
+            const center = new THREE.Vector3();
+            geometry.boundingBox.getCenter(center);
+            geometry.translate(-center.x, -center.y, -center.z);
+
+            const size = new THREE.Vector3();
+            geometry.boundingBox.getSize(size);
+            const maxDim = Math.max(size.x, size.y, size.z);
+            const baseScale = 3.0 / maxDim;
+
+            for (let i = 0; i < 4; i++) {
+                const angle = (i / 4) * Math.PI * 2;
+                const w = new Wombat(scene.root, geometry, baseScale, wombatColors[i], i);
+                w.position.set(Math.cos(angle) * 10, -5.5, Math.sin(angle) * 10);
+                w.facingAngle = angle + Math.PI;
+                w.pickNewTarget();
+                wombats.push(w);
+            }
+        }, undefined, function(err) {
+            console.error('Failed to load wombat STL', err);
+        });
+
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('overlay').style.display = 'block';
+
+        const playBtn = document.getElementById('playBtn');
+        const seekBar = document.getElementById('seekBar');
+        const timeDisplay = document.getElementById('timeDisplay');
+        const beatMarker = document.getElementById('beatMarker');
+        const beatFlash = document.getElementById('beatFlash');
+
+        playBtn.addEventListener('click', () => {
+            analyzer.enable();
+            if (player.isPlaying) {
+                player.pause();
+                sfPlayer.pause();
+                playBtn.textContent = '▶ Play';
+            } else {
+                player.play().then(() => {
+                    sfPlayer.play();
+                    playBtn.textContent = '⏸ Pause';
+                }).catch(err => {
+                    console.error('Playback failed', err);
+                });
+            }
+        });
+
+        seekBar.addEventListener('input', () => {
+            const t = parseFloat(seekBar.value);
+            player.seek(t);
+            sfPlayer.seek(t);
+            nextBeatIndex = 0;
+        });
+
+        player.on('pause', () => { playBtn.textContent = '▶ Play'; })
+              .on('play', () => { playBtn.textContent = '⏸ Pause'; })
+              .on('ended', () => { playBtn.textContent = 'Replay'; });
+
+        function updateLetters(t) {
+            const elapsed = Math.max(0, t);
+            letters.forEach((letter) => {
+                if (letter.userData.state === 'carried' || letter.userData.state === 'stored') return;
+                const home = letter.userData.home;
+                const idx = letter.userData.idx;
+                const phase = letter.userData.phase;
+
+                let targetY = home.y + Math.sin(t * 2 + phase) * 0.15;
+                let targetZ = home.z;
+                let targetX = home.x;
+                let rotY = 0;
+                let rotX = Math.sin(t + phase) * 0.05;
+                let scale = 1;
+
+                if (elapsed > 0 && elapsed < 6.0) {
+                    if (elapsed < 2.0) {
+                        const spinStart = idx * 0.06;
+                        const spinProgress = Math.min(1, Math.max(0, (elapsed - spinStart) / 0.5));
+                        if (spinProgress > 0) {
+                            rotY = spinProgress * Math.PI * 2;
+                            scale = 1 + Math.sin(spinProgress * Math.PI) * 0.2;
+                        }
+                    } else if (elapsed < 4.0) {
+                        const p = (elapsed - 2.0) / 2.0;
+                        const angle = (idx / letters.length) * Math.PI * 2 + t;
+                        const radius = 6 * Math.sin(p * Math.PI);
+                        targetY = home.y + Math.sin(angle) * radius * 0.4;
+                        targetZ = home.z + Math.cos(angle) * radius;
+                        rotY = p * Math.PI * 4;
+                        rotX = p * Math.PI * 2;
+                    } else {
+                        const p = (elapsed - 4.0) / 2.0;
+                        const angle = (idx / letters.length) * Math.PI * 2 + 4;
+                        const radius = 6 * Math.sin((1 - p) * Math.PI / 2);
+                        targetY = home.y + Math.sin(angle) * radius * 0.4;
+                        targetZ = home.z + Math.cos(angle) * radius;
+                        rotY = (1 - p) * Math.PI * 4;
+                    }
+                }
+
+                letter.userData.current.set(targetX, targetY, targetZ);
+                letter.position.copy(letter.userData.current);
+                letter.rotation.x = rotX;
+                letter.rotation.y = rotY;
+                letter.scale.setScalar(scale);
+            });
+        }
+
+        function updateBurrows(dt) {
+            burrows.forEach(b => {
+                if (typeof b.opening === 'number') {
+                    b.opening += dt * 3;
+                    const s = Math.min(1, b.opening);
+                    b.rim.scale.set(s, s, s);
+                    b.mound.scale.set(s, s, s);
+                    if (s >= 1) b.opening = null;
+                }
+            });
+        }
+
+        function resetConfetti(c) {
+            c.visible = true;
+            c.position.set(
+                (Math.random() - 0.5) * 50,
+                12 + Math.random() * 8,
+                (Math.random() - 0.5) * 25 - 5
+            );
+            c.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
+            c.userData.state = 'falling';
+            c.userData.velocity.set(
+                (Math.random() - 0.5) * 0.5,
+                -(0.5 + Math.random() * 1.5),
+                (Math.random() - 0.5) * 0.5
+            );
+            c.userData.rotSpeed = (Math.random() - 0.5) * 0.2;
+            c.userData.wobble = Math.random() * Math.PI * 2;
+            c.userData.settleOffset = Math.random() * 0.2;
+        }
+
+        function updateConfetti(dt, t) {
+            // Keep a healthy number of falling particles
+            while (confetti.length < 180) {
+                spawnConfetti();
+            }
+
+            confetti.forEach(c => {
+                const d = c.userData;
+                if (d.state === 'falling') {
+                    d.velocity.y -= 9.8 * dt * 0.3;
+                    c.position.addScaledVector(d.velocity, dt);
+                    c.rotation.x += d.rotSpeed;
+                    c.rotation.y += d.rotSpeed * 1.3;
+                    c.position.x += Math.sin(t + d.wobble) * 0.01;
+                    if (c.position.y <= FLOOR_Y + d.settleOffset) {
+                        c.position.y = FLOOR_Y + d.settleOffset;
+                        d.state = 'settled';
+                        d.velocity.set(0, 0, 0);
+                    }
+                } else {
+                    // Plow by wombats
+                    let pushed = false;
+                    for (const w of wombats) {
+                        const dx = c.position.x - w.position.x;
+                        const dz = c.position.z - w.position.z;
+                        const distSq = dx * dx + dz * dz;
+                        if (distSq < 5.0) {
+                            const dist = Math.sqrt(distSq) || 0.01;
+                            const force = (5.0 - distSq) / 5.0;
+                            const fx = Math.sin(w.facingAngle);
+                            const fz = Math.cos(w.facingAngle);
+                            d.velocity.x += fx * force * 6 + (dx / dist) * force * 2;
+                            d.velocity.z += fz * force * 6 + (dz / dist) * force * 2;
+                            d.velocity.y += force * 4;
+                            pushed = true;
+                        }
+                    }
+                    // Suck toward nearest burrow if close
+                    if (!pushed && d.state === 'settled') {
+                        let nearestB = null;
+                        let nearestD = Infinity;
+                        burrows.forEach(b => {
+                            const dx = c.position.x - b.x;
+                            const dz = c.position.z - b.z;
+                            const dd = dx * dx + dz * dz;
+                            if (dd < nearestD) { nearestD = dd; nearestB = b; }
+                        });
+                        if (nearestB && nearestD < 4.0) {
+                            const dist = Math.sqrt(nearestD) || 0.01;
+                            const force = (4.0 - nearestD) / 4.0;
+                            d.velocity.x -= ((c.position.x - nearestB.x) / dist) * force * 2;
+                            d.velocity.z -= ((c.position.z - nearestB.z) / dist) * force * 2;
+                            d.velocity.y -= force * 2;
+                            if (dist < 1.2) {
+                                d.state = 'sinking';
+                            } else {
+                                d.state = 'drifting';
+                            }
+                        }
+                    }
+                    if (pushed) d.state = 'drifting';
+
+                    if (d.state === 'drifting' || d.state === 'sinking') {
+                        d.velocity.y -= 9.8 * dt * 0.3;
+                        c.position.addScaledVector(d.velocity, dt);
+                        c.rotation.x += d.rotSpeed * 2;
+                        c.rotation.y += d.rotSpeed * 2.6;
+                        d.velocity.multiplyScalar(0.96);
+                        if (d.state === 'sinking' && c.position.y < -8.5) {
+                            // Recycle instead of removing
+                            resetConfetti(c);
+                        } else if (c.position.y <= FLOOR_Y + d.settleOffset) {
+                            c.position.y = FLOOR_Y + d.settleOffset;
+                            d.state = 'settled';
+                            d.velocity.set(0, 0, 0);
+                        }
+                    }
+                }
+
+                // Recycle confetti that fell out of view
+                if (c.position.y < -12) {
+                    resetConfetti(c);
+                }
+            });
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const t = player.currentTime;
+            const dur = player.duration || 44;
+            const wallTime = clock.now();
+            const rawDt = wallTime - lastFrameTime;
+            lastFrameTime = wallTime;
+            const dt = Math.min(0.05, rawDt || 1 / 60);
+            const isPlaying = player.isPlaying;
+
+            // Schedule soundfont notes ahead of current time
+            sfPlayer.schedule();
+
+            // Seek bar
+            seekBar.max = dur;
+            if (!seekBar.matches(':active')) seekBar.value = t;
+            timeDisplay.textContent = `${formatTime(t)} / ${formatTime(dur)}`;
+            beatMarker.style.left = `${(t / dur) * 100}%`;
+
+            // Beat rings on authored beat times
+            while (nextBeatIndex < beatTimes.length && beatTimes[nextBeatIndex] <= t) {
+                if (wombats.length) {
+                    const w = wombats[nextBeatIndex % wombats.length];
+                    spawnBeatRing(w.position.x, w.position.z, 0xffd700);
+                } else {
+                    spawnBeatRing(0, 0, 0xffd700);
+                }
+                beatFlash.style.opacity = 0.4;
+                setTimeout(() => { beatFlash.style.opacity = 0; }, 80);
+                nextBeatIndex++;
+            }
+
+            // Update beat rings
+            for (let i = beatRings.length - 1; i >= 0; i--) {
+                const br = beatRings[i];
+                const age = t - br.birth;
+                const s = 1 + age * 8;
+                br.mesh.scale.set(s, s, s);
+                br.mesh.material.opacity = Math.max(0, 0.85 - age * 1.2);
+                if (br.mesh.material.opacity <= 0.01) {
+                    br.mesh.visible = false;
+                    ringPool.push(br);
+                    beatRings.splice(i, 1);
+                }
+            }
+
+            // Sound bars
+            if (analyzer.analyser && analyzer.dataArray) {
+                analyzer.analyser.getByteFrequencyData(analyzer.dataArray);
+                const step = Math.floor(analyzer.dataArray.length / soundBars.length);
+                for (let i = 0; i < soundBars.length; i++) {
+                    const value = analyzer.dataArray[i * step] / 255;
+                    const h = 1 + value * 12;
+                    soundBars[i].scale.y = h;
+                    soundBars[i].position.y = -7 + h / 2;
+                    soundBars[i].material.opacity = 0.3 + value * 0.7;
+                }
+            }
+
+            // Letter animation (home tiles only)
+            updateLetters(t);
+
+            // Wombats — freeze when music is paused
+            if (isPlaying) {
+                wombats.forEach((w, i) => w.update(dt, t, isPlaying));
+            }
+
+            updateBurrows(dt);
+            updateConfetti(dt, t);
+
+            // Ring pulse
+            const pulse = 1 + Math.sin(wallTime * 3) * 0.08;
+            ring.scale.set(pulse, pulse, pulse);
+
+            // Camera drift
+            scene.camera.position.x = Math.sin(wallTime * 0.12) * 2;
+            scene.camera.position.y = 5 + Math.cos(wallTime * 0.08) * 0.5;
+            scene.camera.lookAt(0, 0, 0);
+
+            scene.render();
+        }
+        animate();
+        } catch (e) {
+            showFatal('Demo failed to start: ' + e.message, isWebGLError(e.message));
+        }
+    })();
+    </script>
+</body>
+</html>

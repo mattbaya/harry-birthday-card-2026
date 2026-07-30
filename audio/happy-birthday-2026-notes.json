@@ -1,0 +1,1643 @@
+{
+  "bpm": 120,
+  "duration": 38.5,
+  "instruments": [
+    "banjo",
+    "violin",
+    "acoustic_bass",
+    "percussion"
+  ],
+  "notes": [
+    {
+      "instrument": "banjo",
+      "note": "C4",
+      "start": 0.0,
+      "duration": 0.3562,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "percussion",
+      "note": "C2",
+      "start": 0.0,
+      "duration": 0.1,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "banjo",
+      "note": "C4",
+      "start": 0.375,
+      "duration": 0.1187,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 0.5,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "banjo",
+      "note": "D4",
+      "start": 0.5,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "percussion",
+      "note": "F#2",
+      "start": 0.5,
+      "duration": 0.05,
+      "velocity": 0.25
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 1.0,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "banjo",
+      "note": "C4",
+      "start": 1.0,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "percussion",
+      "note": "D2",
+      "start": 1.0,
+      "duration": 0.1,
+      "velocity": 0.5
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "F3",
+      "start": 1.5,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "banjo",
+      "note": "F4",
+      "start": 1.5,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "percussion",
+      "note": "C2",
+      "start": 1.5,
+      "duration": 0.1,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 2.0,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "banjo",
+      "note": "E4",
+      "start": 2.0,
+      "duration": 0.95,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "percussion",
+      "note": "F#2",
+      "start": 2.0,
+      "duration": 0.05,
+      "velocity": 0.25
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "G3",
+      "start": 2.5,
+      "duration": 0.45,
+      "velocity": 0.6
+    },
+    {
+      "instrument": "percussion",
+      "note": "D2",
+      "start": 2.5,
+      "duration": 0.1,
+      "velocity": 0.5
+    },
+    {
+      "instrument": "percussion",
+      "note": "C2",
+      "start": 3.0,
+      "duration": 0.1,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "violin",
+      "note": "C4",
+      "start": 3.0,
+      "duration": 0.3562,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "violin",
+      "note": "C4",
+      "start": 3.375,
+      "duration": 0.1187,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 3.5,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "percussion",
+      "note": "F#2",
+      "start": 3.5,
+      "duration": 0.05,
+      "velocity": 0.25
+    },
+    {
+      "instrument": "violin",
+      "note": "D4",
+      "start": 3.5,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 4.0,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "percussion",
+      "note": "D2",
+      "start": 4.0,
+      "duration": 0.1,
+      "velocity": 0.5
+    },
+    {
+      "instrument": "violin",
+      "note": "C4",
+      "start": 4.0,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "G3",
+      "start": 4.5,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "percussion",
+      "note": "C2",
+      "start": 4.5,
+      "duration": 0.1,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "violin",
+      "note": "G4",
+      "start": 4.5,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 5.0,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "percussion",
+      "note": "F#2",
+      "start": 5.0,
+      "duration": 0.05,
+      "velocity": 0.25
+    },
+    {
+      "instrument": "violin",
+      "note": "F4",
+      "start": 5.0,
+      "duration": 0.95,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "G3",
+      "start": 5.5,
+      "duration": 0.45,
+      "velocity": 0.6
+    },
+    {
+      "instrument": "percussion",
+      "note": "D2",
+      "start": 5.5,
+      "duration": 0.1,
+      "velocity": 0.5
+    },
+    {
+      "instrument": "banjo",
+      "note": "C4",
+      "start": 6.0,
+      "duration": 0.3562,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "percussion",
+      "note": "C2",
+      "start": 6.0,
+      "duration": 0.1,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "violin",
+      "note": "C4",
+      "start": 6.0,
+      "duration": 0.3562,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "banjo",
+      "note": "C4",
+      "start": 6.375,
+      "duration": 0.1187,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "violin",
+      "note": "C4",
+      "start": 6.375,
+      "duration": 0.1187,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "F3",
+      "start": 6.5,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "banjo",
+      "note": "C5",
+      "start": 6.5,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "percussion",
+      "note": "F#2",
+      "start": 6.5,
+      "duration": 0.05,
+      "velocity": 0.25
+    },
+    {
+      "instrument": "violin",
+      "note": "C5",
+      "start": 6.5,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 7.0,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "banjo",
+      "note": "A4",
+      "start": 7.0,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "percussion",
+      "note": "D2",
+      "start": 7.0,
+      "duration": 0.1,
+      "velocity": 0.5
+    },
+    {
+      "instrument": "violin",
+      "note": "A4",
+      "start": 7.0,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "G3",
+      "start": 7.5,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "banjo",
+      "note": "F4",
+      "start": 7.5,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "percussion",
+      "note": "C2",
+      "start": 7.5,
+      "duration": 0.1,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "violin",
+      "note": "F4",
+      "start": 7.5,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 8.0,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "banjo",
+      "note": "E4",
+      "start": 8.0,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "percussion",
+      "note": "F#2",
+      "start": 8.0,
+      "duration": 0.05,
+      "velocity": 0.25
+    },
+    {
+      "instrument": "violin",
+      "note": "E4",
+      "start": 8.0,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 8.5,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "banjo",
+      "note": "D4",
+      "start": 8.5,
+      "duration": 0.95,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "percussion",
+      "note": "D2",
+      "start": 8.5,
+      "duration": 0.1,
+      "velocity": 0.5
+    },
+    {
+      "instrument": "violin",
+      "note": "D4",
+      "start": 8.5,
+      "duration": 0.95,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "G3",
+      "start": 9.0,
+      "duration": 0.45,
+      "velocity": 0.6
+    },
+    {
+      "instrument": "percussion",
+      "note": "C2",
+      "start": 9.0,
+      "duration": 0.1,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "percussion",
+      "note": "F#2",
+      "start": 9.5,
+      "duration": 0.05,
+      "velocity": 0.25
+    },
+    {
+      "instrument": "violin",
+      "note": "Bb4",
+      "start": 9.5,
+      "duration": 0.3562,
+      "velocity": 0.7
+    },
+    {
+      "instrument": "violin",
+      "note": "Bb4",
+      "start": 9.875,
+      "duration": 0.1187,
+      "velocity": 0.7
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 10.0,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "percussion",
+      "note": "D2",
+      "start": 10.0,
+      "duration": 0.1,
+      "velocity": 0.5
+    },
+    {
+      "instrument": "violin",
+      "note": "A3",
+      "start": 10.0,
+      "duration": 0.475,
+      "velocity": 0.7
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "F3",
+      "start": 10.5,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "percussion",
+      "note": "C2",
+      "start": 10.5,
+      "duration": 0.1,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "violin",
+      "note": "F4",
+      "start": 10.5,
+      "duration": 0.475,
+      "velocity": 0.7
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 11.0,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "percussion",
+      "note": "F#2",
+      "start": 11.0,
+      "duration": 0.05,
+      "velocity": 0.25
+    },
+    {
+      "instrument": "violin",
+      "note": "G4",
+      "start": 11.0,
+      "duration": 0.475,
+      "velocity": 0.7
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 11.5,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "percussion",
+      "note": "D2",
+      "start": 11.5,
+      "duration": 0.1,
+      "velocity": 0.5
+    },
+    {
+      "instrument": "violin",
+      "note": "F3",
+      "start": 11.5,
+      "duration": 0.95,
+      "velocity": 0.7
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "G3",
+      "start": 12.0,
+      "duration": 0.45,
+      "velocity": 0.6
+    },
+    {
+      "instrument": "percussion",
+      "note": "C2",
+      "start": 12.0,
+      "duration": 0.1,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "banjo",
+      "note": "C4",
+      "start": 12.5,
+      "duration": 0.3562,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "percussion",
+      "note": "F#2",
+      "start": 12.5,
+      "duration": 0.05,
+      "velocity": 0.25
+    },
+    {
+      "instrument": "banjo",
+      "note": "C4",
+      "start": 12.875,
+      "duration": 0.1187,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 13.0,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "banjo",
+      "note": "D4",
+      "start": 13.0,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "percussion",
+      "note": "D2",
+      "start": 13.0,
+      "duration": 0.1,
+      "velocity": 0.5
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "G3",
+      "start": 13.5,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "banjo",
+      "note": "C4",
+      "start": 13.5,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "percussion",
+      "note": "C2",
+      "start": 13.5,
+      "duration": 0.1,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 14.0,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "banjo",
+      "note": "F4",
+      "start": 14.0,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "percussion",
+      "note": "F#2",
+      "start": 14.0,
+      "duration": 0.05,
+      "velocity": 0.25
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 14.5,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "banjo",
+      "note": "E4",
+      "start": 14.5,
+      "duration": 0.95,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "percussion",
+      "note": "D2",
+      "start": 14.5,
+      "duration": 0.1,
+      "velocity": 0.5
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "G3",
+      "start": 15.0,
+      "duration": 0.45,
+      "velocity": 0.6
+    },
+    {
+      "instrument": "percussion",
+      "note": "C2",
+      "start": 15.0,
+      "duration": 0.1,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "percussion",
+      "note": "F#2",
+      "start": 15.5,
+      "duration": 0.05,
+      "velocity": 0.25
+    },
+    {
+      "instrument": "violin",
+      "note": "C4",
+      "start": 15.5,
+      "duration": 0.3562,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "violin",
+      "note": "C4",
+      "start": 15.875,
+      "duration": 0.1187,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 16.0,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "percussion",
+      "note": "D2",
+      "start": 16.0,
+      "duration": 0.1,
+      "velocity": 0.5
+    },
+    {
+      "instrument": "violin",
+      "note": "D4",
+      "start": 16.0,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "G3",
+      "start": 16.5,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "percussion",
+      "note": "C2",
+      "start": 16.5,
+      "duration": 0.1,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "violin",
+      "note": "C4",
+      "start": 16.5,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 17.0,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "percussion",
+      "note": "F#2",
+      "start": 17.0,
+      "duration": 0.05,
+      "velocity": 0.25
+    },
+    {
+      "instrument": "violin",
+      "note": "G4",
+      "start": 17.0,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 17.5,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "percussion",
+      "note": "D2",
+      "start": 17.5,
+      "duration": 0.1,
+      "velocity": 0.5
+    },
+    {
+      "instrument": "violin",
+      "note": "F4",
+      "start": 17.5,
+      "duration": 0.95,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "G3",
+      "start": 18.0,
+      "duration": 0.45,
+      "velocity": 0.6
+    },
+    {
+      "instrument": "percussion",
+      "note": "C2",
+      "start": 18.0,
+      "duration": 0.1,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "banjo",
+      "note": "C4",
+      "start": 18.5,
+      "duration": 0.3562,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "percussion",
+      "note": "F#2",
+      "start": 18.5,
+      "duration": 0.05,
+      "velocity": 0.25
+    },
+    {
+      "instrument": "violin",
+      "note": "C4",
+      "start": 18.5,
+      "duration": 0.3562,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "banjo",
+      "note": "C4",
+      "start": 18.875,
+      "duration": 0.1187,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "violin",
+      "note": "C4",
+      "start": 18.875,
+      "duration": 0.1187,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 19.0,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "banjo",
+      "note": "C5",
+      "start": 19.0,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "percussion",
+      "note": "D2",
+      "start": 19.0,
+      "duration": 0.1,
+      "velocity": 0.5
+    },
+    {
+      "instrument": "violin",
+      "note": "C5",
+      "start": 19.0,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "F3",
+      "start": 19.5,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "banjo",
+      "note": "A4",
+      "start": 19.5,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "percussion",
+      "note": "C2",
+      "start": 19.5,
+      "duration": 0.1,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "violin",
+      "note": "A4",
+      "start": 19.5,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 20.0,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "banjo",
+      "note": "F4",
+      "start": 20.0,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "percussion",
+      "note": "F#2",
+      "start": 20.0,
+      "duration": 0.05,
+      "velocity": 0.25
+    },
+    {
+      "instrument": "violin",
+      "note": "F4",
+      "start": 20.0,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 20.5,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "banjo",
+      "note": "E4",
+      "start": 20.5,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "percussion",
+      "note": "D2",
+      "start": 20.5,
+      "duration": 0.1,
+      "velocity": 0.5
+    },
+    {
+      "instrument": "violin",
+      "note": "E4",
+      "start": 20.5,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 21.0,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "percussion",
+      "note": "C2",
+      "start": 21.0,
+      "duration": 0.1,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "violin",
+      "note": "D4",
+      "start": 21.0,
+      "duration": 0.95,
+      "velocity": 0.7
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "G3",
+      "start": 21.5,
+      "duration": 0.45,
+      "velocity": 0.6
+    },
+    {
+      "instrument": "percussion",
+      "note": "F#2",
+      "start": 21.5,
+      "duration": 0.05,
+      "velocity": 0.25
+    },
+    {
+      "instrument": "percussion",
+      "note": "D2",
+      "start": 22.0,
+      "duration": 0.1,
+      "velocity": 0.5
+    },
+    {
+      "instrument": "violin",
+      "note": "Bb4",
+      "start": 22.0,
+      "duration": 0.3562,
+      "velocity": 0.7
+    },
+    {
+      "instrument": "violin",
+      "note": "Bb3",
+      "start": 22.375,
+      "duration": 0.1187,
+      "velocity": 0.7
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "G3",
+      "start": 22.5,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "percussion",
+      "note": "C2",
+      "start": 22.5,
+      "duration": 0.1,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "violin",
+      "note": "A4",
+      "start": 22.5,
+      "duration": 0.475,
+      "velocity": 0.7
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 23.0,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "percussion",
+      "note": "F#2",
+      "start": 23.0,
+      "duration": 0.05,
+      "velocity": 0.25
+    },
+    {
+      "instrument": "violin",
+      "note": "F4",
+      "start": 23.0,
+      "duration": 0.475,
+      "velocity": 0.7
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 23.5,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "percussion",
+      "note": "D2",
+      "start": 23.5,
+      "duration": 0.1,
+      "velocity": 0.5
+    },
+    {
+      "instrument": "violin",
+      "note": "G3",
+      "start": 23.5,
+      "duration": 0.475,
+      "velocity": 0.7
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 24.0,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "banjo",
+      "note": "F4",
+      "start": 24.0,
+      "duration": 0.95,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "percussion",
+      "note": "C2",
+      "start": 24.0,
+      "duration": 0.1,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "G3",
+      "start": 24.5,
+      "duration": 0.45,
+      "velocity": 0.6
+    },
+    {
+      "instrument": "percussion",
+      "note": "F#2",
+      "start": 24.5,
+      "duration": 0.05,
+      "velocity": 0.25
+    },
+    {
+      "instrument": "banjo",
+      "note": "C4",
+      "start": 25.0,
+      "duration": 0.3562,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "percussion",
+      "note": "D2",
+      "start": 25.0,
+      "duration": 0.1,
+      "velocity": 0.5
+    },
+    {
+      "instrument": "banjo",
+      "note": "C4",
+      "start": 25.375,
+      "duration": 0.1187,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "G3",
+      "start": 25.5,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "banjo",
+      "note": "D4",
+      "start": 25.5,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "percussion",
+      "note": "C2",
+      "start": 25.5,
+      "duration": 0.1,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 26.0,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "banjo",
+      "note": "C4",
+      "start": 26.0,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "percussion",
+      "note": "F#2",
+      "start": 26.0,
+      "duration": 0.05,
+      "velocity": 0.25
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 26.5,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "banjo",
+      "note": "F4",
+      "start": 26.5,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "percussion",
+      "note": "D2",
+      "start": 26.5,
+      "duration": 0.1,
+      "velocity": 0.5
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 27.0,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "percussion",
+      "note": "C2",
+      "start": 27.0,
+      "duration": 0.1,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "violin",
+      "note": "E4",
+      "start": 27.0,
+      "duration": 0.95,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "G3",
+      "start": 27.5,
+      "duration": 0.45,
+      "velocity": 0.6
+    },
+    {
+      "instrument": "percussion",
+      "note": "F#2",
+      "start": 27.5,
+      "duration": 0.05,
+      "velocity": 0.25
+    },
+    {
+      "instrument": "percussion",
+      "note": "D2",
+      "start": 28.0,
+      "duration": 0.1,
+      "velocity": 0.5
+    },
+    {
+      "instrument": "violin",
+      "note": "C4",
+      "start": 28.0,
+      "duration": 0.3562,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "violin",
+      "note": "C4",
+      "start": 28.375,
+      "duration": 0.1187,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 28.5,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "percussion",
+      "note": "C2",
+      "start": 28.5,
+      "duration": 0.1,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "violin",
+      "note": "D4",
+      "start": 28.5,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 29.0,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "percussion",
+      "note": "F#2",
+      "start": 29.0,
+      "duration": 0.05,
+      "velocity": 0.25
+    },
+    {
+      "instrument": "violin",
+      "note": "C4",
+      "start": 29.0,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 29.5,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "percussion",
+      "note": "D2",
+      "start": 29.5,
+      "duration": 0.1,
+      "velocity": 0.5
+    },
+    {
+      "instrument": "violin",
+      "note": "G4",
+      "start": 29.5,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 30.0,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "banjo",
+      "note": "F4",
+      "start": 30.0,
+      "duration": 0.95,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "percussion",
+      "note": "C2",
+      "start": 30.0,
+      "duration": 0.1,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "violin",
+      "note": "F4",
+      "start": 30.0,
+      "duration": 0.95,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "G3",
+      "start": 30.5,
+      "duration": 0.45,
+      "velocity": 0.6
+    },
+    {
+      "instrument": "percussion",
+      "note": "F#2",
+      "start": 30.5,
+      "duration": 0.05,
+      "velocity": 0.25
+    },
+    {
+      "instrument": "banjo",
+      "note": "C4",
+      "start": 31.0,
+      "duration": 0.3562,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "percussion",
+      "note": "D2",
+      "start": 31.0,
+      "duration": 0.1,
+      "velocity": 0.5
+    },
+    {
+      "instrument": "violin",
+      "note": "C4",
+      "start": 31.0,
+      "duration": 0.3562,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "banjo",
+      "note": "C4",
+      "start": 31.375,
+      "duration": 0.1187,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "violin",
+      "note": "C4",
+      "start": 31.375,
+      "duration": 0.1187,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 31.5,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "banjo",
+      "note": "C5",
+      "start": 31.5,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "percussion",
+      "note": "C2",
+      "start": 31.5,
+      "duration": 0.1,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "violin",
+      "note": "C5",
+      "start": 31.5,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 32.0,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "banjo",
+      "note": "A4",
+      "start": 32.0,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "percussion",
+      "note": "F#2",
+      "start": 32.0,
+      "duration": 0.05,
+      "velocity": 0.25
+    },
+    {
+      "instrument": "violin",
+      "note": "A4",
+      "start": 32.0,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 32.5,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "banjo",
+      "note": "F4",
+      "start": 32.5,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "percussion",
+      "note": "D2",
+      "start": 32.5,
+      "duration": 0.1,
+      "velocity": 0.5
+    },
+    {
+      "instrument": "violin",
+      "note": "F4",
+      "start": 32.5,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 33.0,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "percussion",
+      "note": "C2",
+      "start": 33.0,
+      "duration": 0.1,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "violin",
+      "note": "E4",
+      "start": 33.0,
+      "duration": 0.475,
+      "velocity": 0.7
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 33.5,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "percussion",
+      "note": "F#2",
+      "start": 33.5,
+      "duration": 0.05,
+      "velocity": 0.25
+    },
+    {
+      "instrument": "violin",
+      "note": "D4",
+      "start": 33.5,
+      "duration": 0.95,
+      "velocity": 0.7
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "G3",
+      "start": 34.0,
+      "duration": 0.45,
+      "velocity": 0.6
+    },
+    {
+      "instrument": "percussion",
+      "note": "D2",
+      "start": 34.0,
+      "duration": 0.1,
+      "velocity": 0.5
+    },
+    {
+      "instrument": "percussion",
+      "note": "C2",
+      "start": 34.5,
+      "duration": 0.1,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "violin",
+      "note": "Bb3",
+      "start": 34.5,
+      "duration": 0.3562,
+      "velocity": 0.7
+    },
+    {
+      "instrument": "violin",
+      "note": "Bb4",
+      "start": 34.875,
+      "duration": 0.1187,
+      "velocity": 0.7
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 35.0,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "percussion",
+      "note": "F#2",
+      "start": 35.0,
+      "duration": 0.05,
+      "velocity": 0.25
+    },
+    {
+      "instrument": "violin",
+      "note": "A4",
+      "start": 35.0,
+      "duration": 0.475,
+      "velocity": 0.7
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 35.5,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "percussion",
+      "note": "D2",
+      "start": 35.5,
+      "duration": 0.1,
+      "velocity": 0.5
+    },
+    {
+      "instrument": "violin",
+      "note": "F3",
+      "start": 35.5,
+      "duration": 0.475,
+      "velocity": 0.7
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 36.0,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "banjo",
+      "note": "G4",
+      "start": 36.0,
+      "duration": 0.475,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "percussion",
+      "note": "C2",
+      "start": 36.0,
+      "duration": 0.1,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "C3",
+      "start": 36.5,
+      "duration": 0.45,
+      "velocity": 0.8
+    },
+    {
+      "instrument": "banjo",
+      "note": "F4",
+      "start": 36.5,
+      "duration": 0.95,
+      "velocity": 0.9
+    },
+    {
+      "instrument": "percussion",
+      "note": "F#2",
+      "start": 36.5,
+      "duration": 0.05,
+      "velocity": 0.25
+    },
+    {
+      "instrument": "acoustic_bass",
+      "note": "G3",
+      "start": 37.0,
+      "duration": 0.45,
+      "velocity": 0.6
+    },
+    {
+      "instrument": "percussion",
+      "note": "D2",
+      "start": 37.0,
+      "duration": 0.1,
+      "velocity": 0.5
+    },
+    {
+      "instrument": "percussion",
+      "note": "C2",
+      "start": 37.5,
+      "duration": 0.1,
+      "velocity": 0.8
+    }
+  ]
+}
