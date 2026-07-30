@@ -941,10 +941,15 @@
                 if (this.homeBurrow) return;
                 const existing = burrows.find(b => !b.dug);
                 if (existing) {
+                    existing.dug = true;
+                    existing.opening = 0;
                     this.homeBurrow = existing;
                 } else {
                     const angle = this.idx * 1.5;
-                    this.homeBurrow = makeBurrow(10 + Math.cos(angle) * 6, Math.sin(angle) * 6, burrows.length);
+                    const b = makeBurrow(8 + Math.cos(angle) * 5, Math.sin(angle) * 5, burrows.length);
+                    b.dug = true;
+                    b.opening = 0;
+                    this.homeBurrow = b;
                 }
             }
 
