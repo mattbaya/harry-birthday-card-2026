@@ -164,12 +164,16 @@
     <script src="lib/STLLoader.js?v=1"></script>
     <script src="https://unpkg.com/soundfont-player@0.12.0/dist/soundfont-player.min.js"></script>
     <script>
-    const WEBGL_INSTRUCTIONS = 'Brave (and some privacy-hardened browsers) block WebGL by default.<br>'
-        + 'To see the 3D visuals, please:<br>'
+    const WEBGL_INSTRUCTIONS = 'This browser is blocking the WebGL context needed for the 3D visuals.<br><br>'
+        + '<b>If you are using Brave:</b><br>'
         + '1. Click the <b>Brave lion icon</b> in the address bar.<br>'
         + '2. Set <b>Shields DOWN</b> for phred.boppers.net.<br>'
-        + '3. <a href="#" onclick="location.reload(true); return false;" style="color:#00d4aa;"><b>Reload this page</b></a>.<br><br>'
-        + 'Or open the demo in Chrome, where it works without changing shields.';
+        + '3. If Shields down does not help, Brave may be blocking WebGL through fingerprinting protection:<br>'
+        + '&nbsp;&nbsp;&nbsp;- Go to <code style="background:#222;padding:2px 4px;border-radius:4px;">brave://settings/shields</code><br>'
+        + '&nbsp;&nbsp;&nbsp;- Set <b>Block fingerprinting</b> to <b>Disabled</b> or <b>Standard</b> (not Strict).<br>'
+        + '&nbsp;&nbsp;&nbsp;- Also check <code style="background:#222;padding:2px 4px;border-radius:4px;">brave://settings/system</code> and make sure hardware acceleration is on.<br>'
+        + '4. <a href="#" onclick="location.reload(true); return false;" style="color:#00d4aa;"><b>Reload this page</b></a>.<br><br>'
+        + '<b>Easiest fix:</b> open this demo in Chrome or Firefox, where it works without changing settings.';
 
     function showFatal(msg, isWebGL) {
         const overlay = document.getElementById('overlay');
