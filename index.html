@@ -294,7 +294,7 @@
 
     (async function() {
         try {
-        const scene = new BoppersScene({ cameraZ: 34, cameraY: 5, background: 0x0a0a20 });
+        const scene = new BoppersScene({ cameraZ: 22, cameraY: 4, background: 0x0a0a20 });
         scene.scene.background = new THREE.Color(0x050510);
 
         const hemiLight = new THREE.HemisphereLight(0xffffff, 0x4444ff, 0.7);
@@ -341,7 +341,7 @@
                 opacity: 0.6
             });
             const bar = new THREE.Mesh(barGeo, barMat);
-            bar.position.set(-16 + i * 2.1, -7, -24);
+            bar.position.set(-28 + i * 3.6, -2, -34);
             scene.scene.add(bar);
             soundBars.push(bar);
         }
@@ -395,7 +395,7 @@
         }
 
         function makeLetterTile(char, color, x, y, z, idx) {
-            const size = 2.0;
+            const size = 3.6;
             const geometry = new THREE.BoxGeometry(size, size, size);
             const tex = createLetterTexture(char, color);
             const sideMat = new THREE.MeshStandardMaterial({ color: new THREE.Color(color), roughness: 0.4, metalness: 0.1 });
@@ -425,7 +425,7 @@
         }
 
         function layoutWord(text, color, y, z) {
-            const spacing = 2.4;
+            const spacing = 4.2;
             const totalWidth = (text.length - 1) * spacing;
             for (let i = 0; i < text.length; i++) {
                 const ch = text[i];
@@ -436,18 +436,17 @@
             }
         }
 
-        layoutWord('HAPPY', '#00d4aa', 7, 0);
-        layoutWord('87TH', '#ffd700', 3, 0);
-        layoutWord('BIRTHDAY', '#e94560', -1, 0);
-        layoutWord('HARRY', '#4285f4', -5, 0);
+        layoutWord('HAPPY', '#00d4aa', 8, 0);
+        layoutWord('87TH', '#ffd700', 4, 0);
+        layoutWord('BIRTHDAY', '#e94560', 0, 0);
+        layoutWord('HARRY', '#4285f4', -1, 0);
 
-        // Ladders — start off-screen; wombats carry them in and set them up
+        // Ladders — stored in a visible rack on the platform edge
         const ladders = [];
-        const LADDER_BOTTOM = -6;
-        const LADDER_TOP = 7;
-        // Keep stash just outside the camera view so wombats briefly leave then return
-        const LADDER_STASH = { x: 18, z: 0 };
-        const WORLD_RADIUS = 16;
+        const LADDER_BOTTOM = -1;
+        const LADDER_TOP = 8.5;
+        const LADDER_STASH = { x: 25, z: 0 };
+        const WORLD_RADIUS = 24;
 
         function makeLadder(x, z) {
             const group = new THREE.Group();
@@ -482,8 +481,192 @@
         });
         highXs.forEach(x => makeLadder(x, 2.5));
 
+        // Visible ladder station/rack at the stash location
+        function makeLadderRack() {
+            const group = new THREE.Group();
+            const frameMat = new THREE.MeshStandardMaterial({ color: 0x8d6e63, roughness: 0.7 });
+            // Base platform
+            const baseGeo = new THREE.BoxGeometry(6, 0.4, 5);
+            const base = new THREE.Mesh(baseGeo, frameMat);
+            base.position.y = -1.1;
+            group.add(base);
+            // Vertical posts
+            const postGeo = new THREE.BoxGeometry(0.25, 4.5, 0.25);
+            for (let px of [-2.2, 2.2]) {
+                for (let pz of [-1.8, 1.8]) {
+                    const post = new THREE.Mesh(postGeo, frameMat);
+                    post.position.set(px, 1.15, pz);
+                    group.add(post);
+                }
+            }
+            // Horizontal rails holding spare ladders
+            const railGeo = new THREE.CylinderGeometry(0.1, 0.1, 4.4, 8);
+            for (let ry of [0.2, 1.6, 3.0]) {
+                const rail = new THREE.Mesh(railGeo, frameMat);
+                rail.rotation.z = Math.PI / 2;
+                rail.position.set(0, ry, -1.8);
+                group.add(rail);
+                const rail2 = new THREE.Mesh(railGeo, frameMat);
+                rail2.rotation.z = Math.PI / 2;
+                rail2.position.set(0, ry, 1.8);
+                group.add(rail2);
+            }
+            // A few decorative spare ladders leaning on the rack
+            const spareGeo = new THREE.CylinderGeometry(0.07, 0.07, 3.8, 8);
+            const spareMat = new THREE.MeshStandardMaterial({ color: 0xa1887f });
+            for (let i = 0; i < 4; i++) {
+                const spare = new THREE.Mesh(spareGeo, spareMat);
+                spare.position.set(-1.5 + i * 1.0, 1.6, 0);
+                spare.rotation.z = 0.12 + Math.random() * 0.06;
+                spare.rotation.y = (Math.random() - 0.5) * 0.2;
+                group.add(spare);
+            }
+            // Glowing sign so the stash is impossible to miss
+            const signGeo = new THREE.BoxGeometry(4.5, 1.0, 0.15);
+            const signMat = new THREE.MeshStandardMaterial({ color: 0x222222, emissive: 0x00d4aa, emissiveIntensity: 0.6 });
+            const sign = new THREE.Mesh(signGeo, signMat);
+            sign.position.set(0, 3.8, 1.9);
+            group.add(sign);
+            // Point light on the sign
+            const rackLight = new THREE.PointLight(0x00d4aa, 0.8, 12);
+            rackLight.position.set(0, 3.5, 0);
+            group.add(rackLight);
+            group.position.set(LADDER_STASH.x, 0, LADDER_STASH.z);
+            scene.root.add(group);
+            return group;
+        }
+        makeLadderRack();
+
+        // Harry — bigger, recognizable older man with white hair and short white beard
+        function makeHarry() {
+            const group = new THREE.Group();
+            const skinMat = new THREE.MeshStandardMaterial({ color: 0xf5cda2, roughness: 0.6 });
+            const whiteMat = new THREE.MeshStandardMaterial({ color: 0xf0f0f0, roughness: 0.8 });
+            const shirtMat = new THREE.MeshStandardMaterial({ color: 0x87ceeb, roughness: 0.7 });
+            const pantMat = new THREE.MeshStandardMaterial({ color: 0x3e4a5e, roughness: 0.8 });
+            const shoeMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.6 });
+
+            // Body
+            const bodyGeo = new THREE.CylinderGeometry(0.9, 1.0, 2.6, 16);
+            const body = new THREE.Mesh(bodyGeo, shirtMat);
+            body.position.y = 2.0;
+            group.add(body);
+
+            // Head
+            const headGeo = new THREE.SphereGeometry(0.75, 24, 24);
+            const head = new THREE.Mesh(headGeo, skinMat);
+            head.position.y = 3.7;
+            group.add(head);
+
+            // White hair (hemisphere on top)
+            const hairGeo = new THREE.SphereGeometry(0.78, 24, 24, 0, Math.PI * 2, 0, Math.PI / 2.2);
+            const hair = new THREE.Mesh(hairGeo, whiteMat);
+            hair.position.y = 3.75;
+            group.add(hair);
+
+            // Side hair / ears cover
+            for (const sx of [-0.62, 0.62]) {
+                const sideGeo = new THREE.SphereGeometry(0.35, 16, 16);
+                const sideHair = new THREE.Mesh(sideGeo, whiteMat);
+                sideHair.position.set(sx, 3.7, -0.1);
+                group.add(sideHair);
+            }
+
+            // White short beard
+            const beardGeo = new THREE.ConeGeometry(0.6, 0.9, 24);
+            const beard = new THREE.Mesh(beardGeo, whiteMat);
+            beard.position.set(0, 3.15, 0.45);
+            beard.rotation.x = Math.PI;
+            group.add(beard);
+
+            // Mustache
+            const stacheGeo = new THREE.CylinderGeometry(0.08, 0.08, 0.7, 8);
+            const stache = new THREE.Mesh(stacheGeo, whiteMat);
+            stache.rotation.z = Math.PI / 2;
+            stache.position.set(0, 3.45, 0.68);
+            group.add(stache);
+
+            // Eyes
+            const eyeGeo = new THREE.SphereGeometry(0.09, 12, 12);
+            const eyeMat = new THREE.MeshBasicMaterial({ color: 0x111111 });
+            for (const ex of [-0.22, 0.22]) {
+                const eye = new THREE.Mesh(eyeGeo, eyeMat);
+                eye.position.set(ex, 3.8, 0.62);
+                group.add(eye);
+            }
+
+            // Glasses
+            const glassesGeo = new THREE.TorusGeometry(0.16, 0.025, 8, 16);
+            const glassesMat = new THREE.MeshStandardMaterial({ color: 0x333333, metalness: 0.6, roughness: 0.3 });
+            for (const gx of [-0.22, 0.22]) {
+                const glass = new THREE.Mesh(glassesGeo, glassesMat);
+                glass.position.set(gx, 3.8, 0.68);
+                group.add(glass);
+            }
+            const bridgeGeo = new THREE.CylinderGeometry(0.025, 0.025, 0.28, 8);
+            const bridge = new THREE.Mesh(bridgeGeo, glassesMat);
+            bridge.rotation.z = Math.PI / 2;
+            bridge.position.set(0, 3.8, 0.68);
+            group.add(bridge);
+
+            // Arms
+            const armGeo = new THREE.CylinderGeometry(0.22, 0.2, 1.6, 12);
+            const leftArm = new THREE.Mesh(armGeo, shirtMat);
+            leftArm.position.set(-1.05, 2.2, 0.2);
+            leftArm.rotation.z = 0.35;
+            leftArm.rotation.x = 0.3;
+            group.add(leftArm);
+            const rightArm = new THREE.Mesh(armGeo, shirtMat);
+            rightArm.position.set(1.05, 2.2, 0.2);
+            rightArm.rotation.z = -0.35;
+            rightArm.rotation.x = 0.3;
+            group.add(rightArm);
+
+            // Hands
+            const handGeo = new THREE.SphereGeometry(0.2, 12, 12);
+            const leftHand = new THREE.Mesh(handGeo, skinMat);
+            leftHand.position.set(-1.35, 1.55, 0.55);
+            group.add(leftHand);
+            const rightHand = new THREE.Mesh(handGeo, skinMat);
+            rightHand.position.set(1.35, 1.55, 0.55);
+            group.add(rightHand);
+
+            // Boplist scroll
+            const scrollGeo = new THREE.BoxGeometry(0.9, 1.3, 0.08);
+            const scrollMat = new THREE.MeshStandardMaterial({ color: 0xfff8dc });
+            const scroll = new THREE.Mesh(scrollGeo, scrollMat);
+            scroll.position.set(1.35, 1.75, 0.6);
+            scroll.rotation.x = -0.3;
+            scroll.rotation.y = 0.15;
+            group.add(scroll);
+
+            // Legs
+            const legGeo = new THREE.CylinderGeometry(0.28, 0.25, 1.5, 12);
+            for (const lx of [-0.4, 0.4]) {
+                const leg = new THREE.Mesh(legGeo, pantMat);
+                leg.position.set(lx, 0.75, 0);
+                group.add(leg);
+            }
+
+            // Shoes
+            const shoeGeo = new THREE.BoxGeometry(0.45, 0.25, 0.8);
+            for (const sx of [-0.4, 0.4]) {
+                const shoe = new THREE.Mesh(shoeGeo, shoeMat);
+                shoe.position.set(sx, 0.12, 0.15);
+                group.add(shoe);
+            }
+
+            // Scale up so Harry is clearly bigger than the wombats
+            group.scale.set(1.6, 1.6, 1.6);
+            group.position.set(16, -1.1, 6);
+            group.rotation.y = -0.4;
+            scene.root.add(group);
+            return group;
+        }
+        makeHarry();
+
         function findUnplacedLadderNeed() {
-            return ladders.find(l => !l.placed && !l.carriedBy);
+            return ladders.find(l => !l.placed && !l.carriedBy && l.group && !l.group.visible);
         }
 
         function nearestLadderToTile(tile) {
@@ -502,9 +685,10 @@
 
         // Confetti
         const confetti = [];
-        const FLOOR_Y = -6.0;
-        const WOMBAT_MIN_Y = -5.5;
-        const WOMBAT_MAX_Y = 5.5;
+        const FLOOR_Y = -1.0;
+        const WOMBAT_MIN_Y = -0.7;
+        const WOMBAT_ROTATION_OFFSET = Math.PI; // flip STL so nose points forward
+        const WOMBAT_MAX_Y = 8.5;
         const colors = [0x00d4aa, 0xe94560, 0xfbbc04, 0x4285f4, 0x9c27b0];
         const confettiGeo = new THREE.BoxGeometry(0.3, 0.3, 0.3);
         function spawnConfetti() {
@@ -532,16 +716,43 @@
         const ringMat = new THREE.MeshBasicMaterial({ color: 0x00d4aa, side: THREE.DoubleSide });
         const ring = new THREE.Mesh(ringGeo, ringMat);
         ring.rotation.x = -Math.PI / 2;
-        ring.position.set(0, -6.2, 0);
+        ring.position.set(0, -1.2, 0);
         scene.root.add(ring);
 
-        // Ground plane
+        // Ground plane (sub-floor, far below)
         const groundGeo = new THREE.PlaneGeometry(120, 80);
         const groundMat = new THREE.MeshStandardMaterial({ color: 0x0a0a18, roughness: 1.0, metalness: 0.0 });
         const ground = new THREE.Mesh(groundGeo, groundMat);
         ground.rotation.x = -Math.PI / 2;
-        ground.position.y = -6.25;
+        ground.position.y = -9.25;
         scene.root.add(ground);
+
+        // Top surface platform — translucent grid so the burrow cylinders below are visible
+        const platformGeo = new THREE.BoxGeometry(70, 0.3, 45);
+        const platformMat = new THREE.MeshStandardMaterial({
+            color: 0x5c7a52,
+            roughness: 0.95,
+            metalness: 0.0,
+            transparent: true,
+            opacity: 0.35
+        });
+        const platform = new THREE.Mesh(platformGeo, platformMat);
+        platform.position.set(0, -1.15, 0);
+        scene.root.add(platform);
+
+        // Grid lines on top of the platform for depth/spatial reference
+        const gridHelper = new THREE.GridHelper(70, 35, 0x88aa77, 0x5c7a52);
+        gridHelper.position.set(0, -0.98, 0);
+        gridHelper.material.transparent = true;
+        gridHelper.material.opacity = 0.35;
+        scene.root.add(gridHelper);
+
+        // Sub-floor discs under each burrow hole (visual connectors)
+        const subFloorGeo = new THREE.CylinderGeometry(32, 32, 0.6, 64);
+        const subFloorMat = new THREE.MeshStandardMaterial({ color: 0x2a1d16, roughness: 1.0 });
+        const subFloor = new THREE.Mesh(subFloorGeo, subFloorMat);
+        subFloor.position.set(0, -9.25, 0);
+        scene.root.add(subFloor);
 
         // Beat rings pool
         const beatRings = [];
@@ -559,7 +770,7 @@
                 br.mesh.rotation.x = -Math.PI / 2;
                 scene.root.add(br.mesh);
             }
-            br.mesh.position.set(x || 0, -6.15, z || 0);
+            br.mesh.position.set(x || 0, -1.15, z || 0);
             br.mesh.scale.set(1, 1, 1);
             br.mesh.material.opacity = 0.85;
             br.birth = player.currentTime;
@@ -571,56 +782,57 @@
 
         function makeBurrow(x, z, idx) {
             const group = new THREE.Group();
-            const depth = 3.5;
-            const radius = 1.6;
+            const depth = 8.0;
+            const radius = 2.6;
 
-            // Bright dirt cylinder container below the floor (clearly visible)
-            const cylinderGeo = new THREE.CylinderGeometry(radius, radius * 0.85, depth, 32, 1, true);
+            // Tall dirt cylinder: rises above the platform so it's impossible to miss
+            const cylinderHeight = depth + 2.5;
+            const cylinderGeo = new THREE.CylinderGeometry(radius, radius * 0.8, cylinderHeight, 32, 1, true);
             const cylinderMat = new THREE.MeshStandardMaterial({
-                color: 0x8d6e63,
+                color: 0xc69c6d,
                 roughness: 0.85,
                 metalness: 0.05,
                 side: THREE.DoubleSide,
                 transparent: true,
-                opacity: 0.92,
-                emissive: 0x3e2723,
-                emissiveIntensity: 0.2
+                opacity: 0.95,
+                emissive: 0x8d6e63,
+                emissiveIntensity: 0.35
             });
             const cylinder = new THREE.Mesh(cylinderGeo, cylinderMat);
-            cylinder.position.y = -6.0 - depth / 2;
+            cylinder.position.y = -1.0 - depth / 2;
             group.add(cylinder);
 
-            // Inner glow ring at the top rim of the cylinder
-            const glowGeo = new THREE.RingGeometry(radius - 0.05, radius + 0.05, 32);
-            const glowMat = new THREE.MeshBasicMaterial({ color: 0xffcc80, side: THREE.DoubleSide, transparent: true, opacity: 0.6 });
+            // Bright rim ring at platform level
+            const glowGeo = new THREE.RingGeometry(radius - 0.05, radius + 0.15, 32);
+            const glowMat = new THREE.MeshBasicMaterial({ color: 0xffd54f, side: THREE.DoubleSide, transparent: true, opacity: 0.9 });
             const glow = new THREE.Mesh(glowGeo, glowMat);
             glow.rotation.x = -Math.PI / 2;
-            glow.position.y = -6.05;
+            glow.position.y = -0.95;
             group.add(glow);
 
             // Dark bottom cap
-            const capGeo = new THREE.CircleGeometry(radius * 0.85, 32);
+            const capGeo = new THREE.CircleGeometry(radius * 0.8, 32);
             const capMat = new THREE.MeshBasicMaterial({ color: 0x1a1008 });
             const cap = new THREE.Mesh(capGeo, capMat);
             cap.rotation.x = Math.PI / 2;
-            cap.position.y = -6.0 - depth;
+            cap.position.y = -1.0 - depth;
             group.add(cap);
 
             // Dirt rim around the hole
-            const rimGeo = new THREE.RingGeometry(radius, radius + 0.8, 32);
-            const rimMat = new THREE.MeshBasicMaterial({ color: 0x8d6e63, side: THREE.DoubleSide });
+            const rimGeo = new THREE.RingGeometry(radius, radius + 0.9, 32);
+            const rimMat = new THREE.MeshBasicMaterial({ color: 0xc69c6d, side: THREE.DoubleSide });
             const rim = new THREE.Mesh(rimGeo, rimMat);
             rim.rotation.x = -Math.PI / 2;
-            rim.position.y = -6.15;
+            rim.position.y = -1.0;
             rim.scale.set(0, 0, 0);
             group.add(rim);
 
             // Raised mound around rim
-            const moundGeo = new THREE.TorusGeometry(radius + 0.5, 0.25, 8, 32);
-            const moundMat = new THREE.MeshStandardMaterial({ color: 0x6d4c41, roughness: 1.0 });
+            const moundGeo = new THREE.TorusGeometry(radius + 0.55, 0.3, 8, 32);
+            const moundMat = new THREE.MeshStandardMaterial({ color: 0xa1887f, roughness: 1.0 });
             const mound = new THREE.Mesh(moundGeo, moundMat);
             mound.rotation.x = -Math.PI / 2;
-            mound.position.y = -6.15;
+            mound.position.y = -1.0;
             mound.scale.set(0, 0, 0);
             group.add(mound);
 
@@ -636,7 +848,7 @@
                 stored: [],
                 opening: null,
                 idx,
-                maxCubes: 6,
+                maxCubes: 4,
                 isFull() { return this.stored.length >= this.maxCubes; }
             };
             burrows.push(burrow);
@@ -655,7 +867,7 @@
                 });
                 this.mesh = new THREE.Mesh(geometry, material);
                 this.mesh.scale.set(baseScale, baseScale, baseScale);
-                this.mesh.position.set(0, -5.5, 4);
+                this.mesh.position.set(0, -0.7, 4);
                 this.mesh.rotation.x = -Math.PI / 2;
                 sceneRoot.add(this.mesh);
 
@@ -676,14 +888,25 @@
                 this.speed = 2.5 + Math.random() * 1.5;
                 this.turnSpeed = 4.0;
                 this.bobOffset = Math.random() * Math.PI;
+                this.stuckTime = 0;
+                this.lastPos = this.position.clone();
                 this.pickNewTarget();
             }
 
             pickNewTarget() {
                 // Stay near the center/burrows; never wander to the world edge
                 const angle = Math.random() * Math.PI * 2;
-                const radius = 2 + Math.random() * 8;
-                this.target.set(Math.cos(angle) * radius, -5.5, Math.sin(angle) * radius);
+                const radius = 2 + Math.random() * 6;
+                this.target.set(Math.cos(angle) * radius, -0.7, Math.sin(angle) * radius);
+            }
+
+            resetToWork() {
+                // Force the wombat back into the central work area and pick real work
+                this.ladderToPlace = null;
+                this.ladder = null;
+                this.carrying = null;
+                this.pickNewTarget();
+                this.setState('wander', 2);
             }
 
             nearestHomeTile(requireHigh) {
@@ -691,8 +914,8 @@
                 let bestD = Infinity;
                 letters.forEach(tile => {
                     if (tile.userData.state !== 'home') return;
-                    if (requireHigh && tile.userData.home.y < 4) return;
-                    if (!requireHigh && tile.userData.home.y >= 4) return;
+                    if (requireHigh && tile.userData.home.y < 3) return;
+                    if (!requireHigh && tile.userData.home.y >= 3) return;
                     const d = tile.position.distanceTo(this.position);
                     if (d < bestD && d < 25) {
                         bestD = d;
@@ -751,6 +974,19 @@
                 // Dance bounce on beats
                 const beatBounce = isPlaying ? Math.abs(Math.sin(t * Math.PI * 4 + this.bobOffset)) * 0.2 : 0;
 
+                // Stuck detection: if we haven't moved much for a while, reset to work
+                const moved = this.position.distanceTo(this.lastPos);
+                if (moved < 0.02) {
+                    this.stuckTime += dt;
+                } else {
+                    this.stuckTime = 0;
+                    this.lastPos.copy(this.position);
+                }
+                if (this.stuckTime > 5.0) {
+                    this.resetToWork();
+                    this.stuckTime = 0;
+                }
+
                 switch (this.state) {
                     case 'wander': {
                         if (this.moveToward(this.target, dt)) {
@@ -763,7 +999,7 @@
                         break;
                     }
                     case 'fetch_ladder': {
-                        const stash = new THREE.Vector3(LADDER_STASH.x, -5.5, LADDER_STASH.z);
+                        const stash = new THREE.Vector3(LADDER_STASH.x, -0.7, LADDER_STASH.z);
                         if (this.moveToward(stash, dt)) {
                             if (this.ladderToPlace && !this.ladderToPlace.carriedBy && !this.ladderToPlace.placed) {
                                 this.ladderToPlace.carriedBy = this;
@@ -778,7 +1014,7 @@
                             this.setState('wander', 3);
                             break;
                         }
-                        this.target.set(this.ladderTargetX, -5.5, this.ladderTargetZ);
+                        this.target.set(this.ladderTargetX, -0.7, this.ladderTargetZ);
                         if (this.moveToward(this.target, dt)) {
                             this.setState('place_ladder', 2);
                         }
@@ -801,7 +1037,7 @@
                     }
                     case 'goto_ladder': {
                         if (this.ladder) {
-                            const base = new THREE.Vector3(this.ladder.x, -5.5, this.ladder.z);
+                            const base = new THREE.Vector3(this.ladder.x, -0.7, this.ladder.z);
                             if (this.moveToward(base, dt)) {
                                 this.setState('climb_up', 4);
                             }
@@ -869,14 +1105,16 @@
                     }
                     case 'steal_floor': {
                         if (!this.carrying || !this.carrying.parent) {
+                            this.ensureHomeBurrow();
                             this.carrying = this.nearestHomeTile(false);
                             if (!this.carrying) { this.setState('wander', 3); break; }
                             this.carrying.userData.state = 'carried';
                             this.carrying.userData.carrier = this;
                         }
                         const targetPos = this.carrying.position.clone();
-                        targetPos.y = -5.5;
+                        targetPos.y = -0.7;
                         if (this.moveToward(targetPos, dt)) {
+                            this.ensureHomeBurrow();
                             this.pickBurrowTarget();
                             this.setState('return', 10);
                         }
@@ -925,7 +1163,7 @@
                 }
 
                 // Update mesh rotation: nose-first
-                this.mesh.rotation.z = this.facingAngle;
+                this.mesh.rotation.z = this.facingAngle + WOMBAT_ROTATION_OFFSET;
 
                 // Carried ladder (horizontal, in front)
                 if (this.ladderToPlace && this.ladderToPlace.group.visible) {
@@ -952,20 +1190,23 @@
                 // Goal: keep stealing cubes and filling burrows. Never idle at the edge.
 
                 // Make sure we have a usable burrow
-                if (!this.homeBurrow || this.homeBurrow.isFull()) {
-                    const openBurrow = burrows.find(b => b.dug && !b.isFull());
-                    if (openBurrow) {
-                        this.homeBurrow = openBurrow;
-                        this.burrow = openBurrow;
-                    } else if (burrows.length < 6) {
-                        // Dig a new burrow near the center
-                        const angle = (this.idx * 1.5) + (Math.random() * 0.8);
-                        const radius = 5 + (this.idx % 3) * 2.5;
-                        this.digSpot = { x: Math.cos(angle) * Math.min(radius, 10), z: Math.sin(angle) * Math.min(radius, 10) };
-                        this.target.set(this.digSpot.x, -5.5, this.digSpot.z);
-                        this.setState('dig', 4);
-                        return;
-                    }
+                let openBurrow = burrows.find(b => b.dug && !b.isFull());
+                if (!openBurrow && burrows.length < 6) {
+                    // Dig a new burrow near the center
+                    const angle = (this.idx * 1.5) + (Math.random() * 0.8);
+                    const radius = 4 + (this.idx % 3) * 2.0;
+                    this.digSpot = { x: Math.cos(angle) * Math.min(radius, 8), z: Math.sin(angle) * Math.min(radius, 8) };
+                    this.target.set(this.digSpot.x, -0.7, this.digSpot.z);
+                    this.setState('dig', 4);
+                    return;
+                }
+                if (openBurrow) {
+                    this.homeBurrow = openBurrow;
+                    this.burrow = openBurrow;
+                } else if (this.homeBurrow && this.homeBurrow.isFull()) {
+                    // All burrows full — celebrate near the center
+                    this.setState('dance', 2 + Math.random() * 2);
+                    return;
                 }
                 this.burrow = this.homeBurrow;
 
@@ -997,8 +1238,8 @@
                     return;
                 }
 
-                // Nothing left to steal — do a small celebratory dance or short walk near center
-                if (Math.random() < 0.5 && t > 0) {
+                // Nothing left to steal — celebrate near the center
+                if (Math.random() < 0.7 && t > 0) {
                     this.setState('dance', 1.5 + Math.random() * 1.5);
                 } else {
                     this.pickNewTarget();
@@ -1026,18 +1267,19 @@
             pickBurrowTarget() {
                 const b = this.burrow || this.homeBurrow;
                 if (!b) {
-                    this.pickNewTarget();
+                    // No burrow yet — head toward center and dig one rather than wandering to the edge
+                    this.target.set(0, -0.7, 0);
                     return;
                 }
-                this.target.set(b.x + (Math.random() - 0.5) * 1.2, -5.5, b.z + (Math.random() - 0.5) * 1.2);
+                this.target.set(b.x + (Math.random() - 0.5) * 1.2, -0.7, b.z + (Math.random() - 0.5) * 1.2);
             }
 
             dig(dt, t) {
                 if (this.digSpot) {
-                    const spot = new THREE.Vector3(this.digSpot.x, -5.5, this.digSpot.z);
+                    const spot = new THREE.Vector3(this.digSpot.x, -0.7, this.digSpot.z);
                     if (this.moveToward(spot, dt)) {
                         // Dig animation
-                        this.position.y = -5.5 + Math.abs(Math.sin(t * 15)) * 0.4;
+                        this.position.y = -0.7 + Math.abs(Math.sin(t * 15)) * 0.4;
                         this.mesh.rotation.z += Math.sin(t * 20) * 0.1;
                         if (this.stateTimer <= 2.0 && this.digSpot) {
                             const b = makeBurrow(this.digSpot.x, this.digSpot.z, burrows.length);
@@ -1063,7 +1305,7 @@
                     this.carrying.userData.carrier = null;
                     // Stack cubes inside the burrow cylinder from the bottom up
                     const cubeSize = 2.0;
-                    const floor = -6.0 - b.depth + cubeSize / 2;
+                    const floor = -1.0 - b.depth + cubeSize / 2;
                     const index = b.stored.length - 1;
                     const y = floor + index * (cubeSize * 0.9);
                     const angle = index * 0.7;
@@ -1098,8 +1340,8 @@
             for (let i = 0; i < 4; i++) {
                 const angle = (i / 4) * Math.PI * 2;
                 const w = new Wombat(scene.root, geometry, baseScale, wombatColors[i], i);
-                w.position.set(Math.cos(angle) * 10, -5.5, Math.sin(angle) * 10);
-                w.facingAngle = angle + Math.PI;
+                w.position.set(Math.cos(angle) * 10, -0.7, Math.sin(angle) * 10);
+                w.facingAngle = angle;
                 w.pickNewTarget();
                 wombats.push(w);
             }
@@ -1383,7 +1625,7 @@
                     const value = analyzer.dataArray[i * step] / 255;
                     const h = 1 + value * 12;
                     soundBars[i].scale.y = h;
-                    soundBars[i].position.y = -7 + h / 2;
+                    soundBars[i].position.y = -2 + h / 2;
                     soundBars[i].material.opacity = 0.3 + value * 0.7;
                 }
             }
@@ -1404,9 +1646,9 @@
             ring.scale.set(pulse, pulse, pulse);
 
             // Camera drift
-            scene.camera.position.x = Math.sin(wallTime * 0.12) * 2;
-            scene.camera.position.y = 5 + Math.cos(wallTime * 0.08) * 0.5;
-            scene.camera.lookAt(0, 0, 0);
+            scene.camera.position.x = Math.sin(wallTime * 0.12) * 3;
+            scene.camera.position.y = 10 + Math.cos(wallTime * 0.08) * 0.8;
+            scene.camera.lookAt(0, 2, 0);
 
             scene.render();
         }
