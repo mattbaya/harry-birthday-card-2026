@@ -446,7 +446,7 @@
         const LADDER_BOTTOM = -6;
         const LADDER_TOP = 7;
         // Keep stash just outside the camera view so wombats briefly leave then return
-        const LADDER_STASH = { x: 22, z: 16 };
+        const LADDER_STASH = { x: 18, z: 0 };
         const WORLD_RADIUS = 16;
 
         function makeLadder(x, z) {
@@ -574,19 +574,29 @@
             const depth = 3.5;
             const radius = 1.6;
 
-            // Visible dirt cylinder container below the floor
+            // Bright dirt cylinder container below the floor (clearly visible)
             const cylinderGeo = new THREE.CylinderGeometry(radius, radius * 0.85, depth, 32, 1, true);
             const cylinderMat = new THREE.MeshStandardMaterial({
-                color: 0x5d4037,
-                roughness: 0.9,
-                metalness: 0.0,
+                color: 0x8d6e63,
+                roughness: 0.85,
+                metalness: 0.05,
                 side: THREE.DoubleSide,
                 transparent: true,
-                opacity: 0.85
+                opacity: 0.92,
+                emissive: 0x3e2723,
+                emissiveIntensity: 0.2
             });
             const cylinder = new THREE.Mesh(cylinderGeo, cylinderMat);
             cylinder.position.y = -6.0 - depth / 2;
             group.add(cylinder);
+
+            // Inner glow ring at the top rim of the cylinder
+            const glowGeo = new THREE.RingGeometry(radius - 0.05, radius + 0.05, 32);
+            const glowMat = new THREE.MeshBasicMaterial({ color: 0xffcc80, side: THREE.DoubleSide, transparent: true, opacity: 0.6 });
+            const glow = new THREE.Mesh(glowGeo, glowMat);
+            glow.rotation.x = -Math.PI / 2;
+            glow.position.y = -6.05;
+            group.add(glow);
 
             // Dark bottom cap
             const capGeo = new THREE.CircleGeometry(radius * 0.85, 32);
@@ -597,20 +607,20 @@
             group.add(cap);
 
             // Dirt rim around the hole
-            const rimGeo = new THREE.RingGeometry(radius, radius + 0.6, 32);
-            const rimMat = new THREE.MeshBasicMaterial({ color: 0x6d4c41, side: THREE.DoubleSide });
+            const rimGeo = new THREE.RingGeometry(radius, radius + 0.8, 32);
+            const rimMat = new THREE.MeshBasicMaterial({ color: 0x8d6e63, side: THREE.DoubleSide });
             const rim = new THREE.Mesh(rimGeo, rimMat);
             rim.rotation.x = -Math.PI / 2;
-            rim.position.y = -6.2;
+            rim.position.y = -6.15;
             rim.scale.set(0, 0, 0);
             group.add(rim);
 
-            // Mound around rim
-            const moundGeo = new THREE.TorusGeometry(radius + 0.4, 0.2, 8, 32);
+            // Raised mound around rim
+            const moundGeo = new THREE.TorusGeometry(radius + 0.5, 0.25, 8, 32);
             const moundMat = new THREE.MeshStandardMaterial({ color: 0x6d4c41, roughness: 1.0 });
             const mound = new THREE.Mesh(moundGeo, moundMat);
             mound.rotation.x = -Math.PI / 2;
-            mound.position.y = -6.2;
+            mound.position.y = -6.15;
             mound.scale.set(0, 0, 0);
             group.add(mound);
 
@@ -618,7 +628,7 @@
             scene.root.add(group);
 
             const burrow = {
-                group, cylinder, rim, mound, cap,
+                group, cylinder, glow, rim, mound, cap,
                 x, z,
                 radius,
                 depth,
