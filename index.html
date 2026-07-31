@@ -568,24 +568,45 @@
 
         // Burrows — real holes that things sink into
         const burrows = [];
+
         function makeBurrow(x, z, idx) {
             const group = new THREE.Group();
-            // Dark pit cylinder going below floor
-            const pitGeo = new THREE.CylinderGeometry(1.6, 1.4, 3, 32, 1, true);
-            const pitMat = new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.DoubleSide });
-            const pit = new THREE.Mesh(pitGeo, pitMat);
-            pit.position.y = -7.7;
-            group.add(pit);
-            // Dirt rim
-            const rimGeo = new THREE.RingGeometry(1.6, 2.2, 32);
-            const rimMat = new THREE.MeshBasicMaterial({ color: 0x5d4037, side: THREE.DoubleSide });
+            const depth = 3.5;
+            const radius = 1.6;
+
+            // Visible dirt cylinder container below the floor
+            const cylinderGeo = new THREE.CylinderGeometry(radius, radius * 0.85, depth, 32, 1, true);
+            const cylinderMat = new THREE.MeshStandardMaterial({
+                color: 0x5d4037,
+                roughness: 0.9,
+                metalness: 0.0,
+                side: THREE.DoubleSide,
+                transparent: true,
+                opacity: 0.85
+            });
+            const cylinder = new THREE.Mesh(cylinderGeo, cylinderMat);
+            cylinder.position.y = -6.0 - depth / 2;
+            group.add(cylinder);
+
+            // Dark bottom cap
+            const capGeo = new THREE.CircleGeometry(radius * 0.85, 32);
+            const capMat = new THREE.MeshBasicMaterial({ color: 0x1a1008 });
+            const cap = new THREE.Mesh(capGeo, capMat);
+            cap.rotation.x = Math.PI / 2;
+            cap.position.y = -6.0 - depth;
+            group.add(cap);
+
+            // Dirt rim around the hole
+            const rimGeo = new THREE.RingGeometry(radius, radius + 0.6, 32);
+            const rimMat = new THREE.MeshBasicMaterial({ color: 0x6d4c41, side: THREE.DoubleSide });
             const rim = new THREE.Mesh(rimGeo, rimMat);
             rim.rotation.x = -Math.PI / 2;
             rim.position.y = -6.2;
             rim.scale.set(0, 0, 0);
             group.add(rim);
+
             // Mound around rim
-            const moundGeo = new THREE.TorusGeometry(1.9, 0.25, 8, 32);
+            const moundGeo = new THREE.TorusGeometry(radius + 0.4, 0.2, 8, 32);
             const moundMat = new THREE.MeshStandardMaterial({ color: 0x6d4c41, roughness: 1.0 });
             const mound = new THREE.Mesh(moundGeo, moundMat);
             mound.rotation.x = -Math.PI / 2;
@@ -595,13 +616,18 @@
 
             group.position.set(x, 0, z);
             scene.root.add(group);
+
             const burrow = {
-                group, pit, rim, mound,
+                group, cylinder, rim, mound, cap,
                 x, z,
+                radius,
+                depth,
                 dug: false,
                 stored: [],
                 opening: null,
-                idx
+                idx,
+                maxCubes: 6,
+                isFull() { return this.stored.length >= this.maxCubes; }
             };
             burrows.push(burrow);
             return burrow;
@@ -644,8 +670,9 @@
             }
 
             pickNewTarget() {
+                // Stay near the center/burrows; never wander to the world edge
                 const angle = Math.random() * Math.PI * 2;
-                const radius = 3 + Math.random() * (WORLD_RADIUS - 3);
+                const radius = 2 + Math.random() * 8;
                 this.target.set(Math.cos(angle) * radius, -5.5, Math.sin(angle) * radius);
             }
 
@@ -857,13 +884,13 @@
                     }
                     case 'drop': {
                         this.dropTile();
-                        this.setState('wander', 3);
+                        this.chooseNextActivity(t);
                         break;
                     }
                     case 'dance': {
                         this.dancePhase += dt * 10;
                         if (this.stateTimer <= 0) {
-                            this.setState('wander', 3);
+                            this.chooseNextActivity(t);
                         }
                         break;
                     }
@@ -912,82 +939,77 @@
             }
 
             chooseNextActivity(t) {
-                const r = Math.random();
-                // Dig a new burrow ~20%
-                if (r < 0.20 && burrows.length < 5) {
-                    const angle = Math.random() * Math.PI * 2;
-                    const radius = 8 + Math.random() * 6;
-                    this.digSpot = { x: Math.cos(angle) * Math.min(radius, WORLD_RADIUS - 2), z: Math.sin(angle) * Math.min(radius, WORLD_RADIUS - 2) };
-                    this.target.set(this.digSpot.x, -5.5, this.digSpot.z);
-                    this.setState('dig', 4);
-                    return;
-                }
-                // Steal a high letter with ladder ~25%
-                if (r < 0.45) {
-                    const tile = this.nearestHomeTile(true);
-                    if (tile) {
-                        this.targetTile = tile;
-                        const placedLadder = nearestLadderToTile(tile);
-                        if (!placedLadder) {
-                            // Need to fetch and place a ladder first
-                            const need = findUnplacedLadderNeed();
-                            if (need) {
-                                this.ladderToPlace = need;
-                                this.ladderTargetX = tile.userData.home.x;
-                                this.ladderTargetZ = 2.5;
-                                if (!this.homeBurrow) this.ensureHomeBurrow();
-                                this.burrow = this.homeBurrow;
-                                this.setState('fetch_ladder', 12);
-                                return;
-                            }
-                        } else {
-                            this.ladder = placedLadder;
-                            if (!this.homeBurrow) this.ensureHomeBurrow();
-                            this.burrow = this.homeBurrow;
-                            this.setState('goto_ladder', 8);
-                            return;
-                        }
-                    }
-                }
-                // Steal a floor letter ~25%
-                if (r < 0.70) {
-                    const tile = this.nearestHomeTile(false);
-                    if (tile) {
-                        this.targetTile = tile;
-                        if (!this.homeBurrow) this.ensureHomeBurrow();
-                        this.burrow = this.homeBurrow;
-                        this.setState('steal_floor', 8);
+                // Goal: keep stealing cubes and filling burrows. Never idle at the edge.
+
+                // Make sure we have a usable burrow
+                if (!this.homeBurrow || this.homeBurrow.isFull()) {
+                    const openBurrow = burrows.find(b => b.dug && !b.isFull());
+                    if (openBurrow) {
+                        this.homeBurrow = openBurrow;
+                        this.burrow = openBurrow;
+                    } else if (burrows.length < 6) {
+                        // Dig a new burrow near the center
+                        const angle = (this.idx * 1.5) + (Math.random() * 0.8);
+                        const radius = 5 + (this.idx % 3) * 2.5;
+                        this.digSpot = { x: Math.cos(angle) * Math.min(radius, 10), z: Math.sin(angle) * Math.min(radius, 10) };
+                        this.target.set(this.digSpot.x, -5.5, this.digSpot.z);
+                        this.setState('dig', 4);
                         return;
                     }
                 }
-                // Dance ~15%
-                if (r < 0.85 && t > 0) {
-                    this.setState('dance', 2 + Math.random() * 2);
+                this.burrow = this.homeBurrow;
+
+                // Try high letters first (more interesting), then floor letters
+                const highTile = this.nearestHomeTile(true);
+                if (highTile) {
+                    this.targetTile = highTile;
+                    const placedLadder = nearestLadderToTile(highTile);
+                    if (!placedLadder) {
+                        const need = findUnplacedLadderNeed();
+                        if (need) {
+                            this.ladderToPlace = need;
+                            this.ladderTargetX = highTile.userData.home.x;
+                            this.ladderTargetZ = 2.5;
+                            this.setState('fetch_ladder', 12);
+                            return;
+                        }
+                    } else {
+                        this.ladder = placedLadder;
+                        this.setState('goto_ladder', 8);
+                        return;
+                    }
+                }
+
+                const floorTile = this.nearestHomeTile(false);
+                if (floorTile) {
+                    this.targetTile = floorTile;
+                    this.setState('steal_floor', 8);
                     return;
                 }
-                // Wander
-                this.pickNewTarget();
-                this.setState('wander', 4 + Math.random() * 3);
+
+                // Nothing left to steal — do a small celebratory dance or short walk near center
+                if (Math.random() < 0.5 && t > 0) {
+                    this.setState('dance', 1.5 + Math.random() * 1.5);
+                } else {
+                    this.pickNewTarget();
+                    this.setState('wander', 2 + Math.random() * 2);
+                }
             }
 
             ensureHomeBurrow() {
-                if (this.homeBurrow) return;
-                const existing = burrows.find(b => !b.dug);
+                if (this.homeBurrow && !this.homeBurrow.isFull()) return;
+                const existing = burrows.find(b => b.dug && !b.isFull());
                 if (existing) {
-                    existing.dug = true;
-                    existing.opening = 0;
                     this.homeBurrow = existing;
-                } else {
-                    const angle = this.idx * 1.5;
-                    const radius = 6 + (this.idx % 3) * 2.5; // 6, 8.5, 11, 6 for four wombats
-                    const b = makeBurrow(
-                        Math.cos(angle) * Math.min(radius, WORLD_RADIUS - 2),
-                        Math.sin(angle) * Math.min(radius, WORLD_RADIUS - 2),
-                        burrows.length
-                    );
-                    b.dug = true;
-                    b.opening = 0;
-                    this.homeBurrow = b;
+                    this.burrow = existing;
+                    return;
+                }
+                const undug = burrows.find(b => !b.dug);
+                if (undug) {
+                    undug.dug = true;
+                    undug.opening = 0;
+                    this.homeBurrow = undug;
+                    this.burrow = undug;
                 }
             }
 
@@ -1024,17 +1046,21 @@
             dropTile() {
                 if (!this.carrying || !this.carrying.parent) return;
                 const b = this.burrow || this.homeBurrow;
-                if (b) {
+                if (b && !b.isFull()) {
                     b.stored.push(this.carrying);
                     this.carrying.userData.state = 'stored';
                     this.carrying.userData.storedIn = b;
                     this.carrying.userData.carrier = null;
-                    // Sink into hole
-                    const angle = b.stored.length * 0.7;
-                    const r = 0.8 + Math.random() * 0.4;
+                    // Stack cubes inside the burrow cylinder from the bottom up
+                    const cubeSize = 2.0;
+                    const floor = -6.0 - b.depth + cubeSize / 2;
+                    const index = b.stored.length - 1;
+                    const y = floor + index * (cubeSize * 0.9);
+                    const angle = index * 0.7;
+                    const r = 0.4 + Math.random() * 0.4;
                     this.carrying.position.set(
                         b.x + Math.cos(angle) * r,
-                        -7.5 - b.stored.length * 0.25,
+                        y,
                         b.z + Math.sin(angle) * r
                     );
                     this.carrying.rotation.set(Math.PI / 2, angle, 0);
