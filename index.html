@@ -1645,9 +1645,10 @@
             const pulse = 1 + Math.sin(wallTime * 3) * 0.08;
             ring.scale.set(pulse, pulse, pulse);
 
-            // Camera drift
-            scene.camera.position.x = Math.sin(wallTime * 0.12) * 3;
-            scene.camera.position.y = 10 + Math.cos(wallTime * 0.08) * 0.8;
+            // Camera drift — pulled back and lowered so the bottom row ('HARRY') stays readable
+            scene.camera.position.x = Math.sin(wallTime * 0.12) * 2;
+            scene.camera.position.y = 5 + Math.cos(wallTime * 0.08) * 0.5;
+            scene.camera.position.z = 34;
             scene.camera.lookAt(0, 2, 0);
 
             scene.render();
