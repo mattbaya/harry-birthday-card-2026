@@ -1,6 +1,6 @@
 # Happy 87th Birthday, Harry! — Boppers-Style Card
 
-A browser-based 3D birthday card built for Harry Baya. It features real wombat models, animated letter cubes, a squad of wombats that dig burrows and steal tiles, confetti physics, and a soundfont-rendered "Happy Birthday" arrangement.
+A browser-based 3D birthday card built for Harry Baya. It features real wombat models, a voxel ground with multi-layer burrows, animated letter cubes, a squad of wombats that dig burrows and steal tiles, confetti physics, and a soundfont-rendered "Happy Birthday" arrangement.
 
 ## Live Demo
 
@@ -29,12 +29,16 @@ A silent MP3 fallback is included to drive the visual timing and sound bars.
 
 ## Wombat Behaviors
 
-- Wander the floor nose-first.
+- Wander the voxel grass nose-first.
 - Dance to the beat.
-- Dig burrows (real sink-in holes).
+- Dig multi-layer burrows through the voxel ground.
 - Carry letter cubes horizontally in their mouths.
 - Run off-screen to fetch ladders, set them up, and climb to high letters.
 - Plow through settled confetti and push it toward burrows.
+
+## Camera
+
+- Left/right arrow keys orbit the camera around the edges of the voxel ground.
 
 ## Regenerating Assets
 

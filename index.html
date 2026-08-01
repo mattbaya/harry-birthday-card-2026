@@ -134,7 +134,7 @@
 
     <div id="overlay" style="display:none;">
         <h1>Happy 87th Birthday, Harry!</h1>
-        <p>A little Boppers-style visual card with music. Press play to start the party.</p>
+        <p>A little Boppers-style visual card with music. Press play to start the party. Use the left/right arrow keys to spin the camera around the voxel ground.</p>
         <div id="controls">
             <button id="playBtn">▶ Play</button>
             <input id="seekBar" type="range" min="0" max="100" value="0" step="0.1">
@@ -309,6 +309,140 @@
         const clock = new BoppersClock();
         let lastFrameTime = clock.now();
 
+        // Voxel ground (ported from Harry's Burrow 3D)
+        const CARD_BLOCK = 2.0;
+        const CARD_COLS = 36;
+        const CARD_ROWS = 24;
+        const CARD_LAYERS = 6;
+        const CARD_SKY = 0;
+        const CARD_SURFACE = 1;
+        const CARD_BEDROCK_LAYER = CARD_LAYERS - 1;
+        const CARD_SURFACE_Y = -0.7; // top of the grass layer
+
+        const CARD_AIR = 0;
+        const CARD_DIRT = 1;
+        const CARD_BEDROCK = 2;
+
+        let cardGrid = [];
+        let cardBlocks = [];
+
+        function cardWorldX(c) { return (c - CARD_COLS / 2) * CARD_BLOCK + CARD_BLOCK / 2; }
+        function cardWorldZ(r) { return (r - CARD_ROWS / 2) * CARD_BLOCK + CARD_BLOCK / 2; }
+        function cardWorldY(l) { return CARD_SURFACE_Y - CARD_BLOCK / 2 - l * CARD_BLOCK; }
+        function cardTileAt(c, r, l) {
+            if (c < 0 || c >= CARD_COLS || r < 0 || r >= CARD_ROWS || l < 0 || l >= CARD_LAYERS) return CARD_BEDROCK;
+            return cardGrid[l][r][c];
+        }
+        function cardSetTile(c, r, l, t) {
+            if (c < 0 || c >= CARD_COLS || r < 0 || r >= CARD_ROWS || l < 0 || l >= CARD_LAYERS) return;
+            cardGrid[l][r][c] = t;
+        }
+
+        const cardBlockGeo = new THREE.BoxGeometry(CARD_BLOCK * 0.98, CARD_BLOCK * 0.98, CARD_BLOCK * 0.98);
+        const cardDirtMat = new THREE.MeshStandardMaterial({ color: 0x7a5c3c, roughness: 1.0 });
+        const cardGrassMat = new THREE.MeshStandardMaterial({ color: 0x4a6741, roughness: 0.95 });
+        const cardBedrockMat = new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 0.9 });
+
+        function cardBuildBlock(c, r, l, type) {
+            let mesh;
+            if (type === CARD_DIRT) {
+                mesh = new THREE.Mesh(cardBlockGeo, l === CARD_SURFACE ? cardGrassMat : cardDirtMat);
+            } else if (type === CARD_BEDROCK) {
+                mesh = new THREE.Mesh(cardBlockGeo, cardBedrockMat);
+            } else {
+                return null;
+            }
+            mesh.position.set(cardWorldX(c), cardWorldY(l), cardWorldZ(r));
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+            mesh.userData = { c, r, l, type };
+            scene.root.add(mesh);
+            cardBlocks.push(mesh);
+            return mesh;
+        }
+
+        function cardRemoveBlockMesh(c, r, l) {
+            const idx = cardBlocks.findIndex(b => b.userData.c === c && b.userData.r === r && b.userData.l === l);
+            if (idx >= 0) {
+                scene.root.remove(cardBlocks[idx]);
+                cardBlocks.splice(idx, 1);
+            }
+        }
+
+        function cardRebuildBlocks() {
+            cardBlocks.forEach(b => scene.root.remove(b));
+            cardBlocks = [];
+            for (let l = 0; l < CARD_LAYERS; l++) {
+                for (let r = 0; r < CARD_ROWS; r++) {
+                    for (let c = 0; c < CARD_COLS; c++) {
+                        cardBuildBlock(c, r, l, cardGrid[l][r][c]);
+                    }
+                }
+            }
+        }
+
+        function cardGridCX(x) { return Math.floor(x / CARD_BLOCK + CARD_COLS / 2); }
+        function cardGridCZ(z) { return Math.floor(z / CARD_BLOCK + CARD_ROWS / 2); }
+
+        function initCardGround() {
+            cardGrid = [];
+            for (let l = 0; l < CARD_LAYERS; l++) {
+                cardGrid[l] = [];
+                for (let r = 0; r < CARD_ROWS; r++) {
+                    cardGrid[l][r] = [];
+                    for (let c = 0; c < CARD_COLS; c++) {
+                        cardGrid[l][r][c] = CARD_DIRT;
+                    }
+                }
+            }
+            for (let r = 0; r < CARD_ROWS; r++) {
+                for (let c = 0; c < CARD_COLS; c++) {
+                    cardGrid[CARD_SKY][r][c] = CARD_AIR;
+                }
+            }
+            for (let r = 0; r < CARD_ROWS; r++) {
+                for (let c = 0; c < CARD_COLS; c++) {
+                    cardGrid[CARD_BEDROCK_LAYER][r][c] = CARD_BEDROCK;
+                }
+            }
+            cardRebuildBlocks();
+        }
+
+        // Orbit camera state
+        let orbitAngle = 0;
+        const ORBIT_RADIUS = Math.max(cardWorldX(CARD_COLS - 1), cardWorldZ(CARD_ROWS - 1)) + 6;
+        const ORBIT_HEIGHT = 14;
+        const ORBIT_CENTER = new THREE.Vector3(0, 3, 0);
+        const ORBIT_KEYS = { left: false, right: false };
+
+        function updateOrbitCamera() {
+            const x = ORBIT_CENTER.x + Math.cos(orbitAngle) * ORBIT_RADIUS;
+            const z = ORBIT_CENTER.z + Math.sin(orbitAngle) * ORBIT_RADIUS;
+            scene.camera.position.set(x, ORBIT_HEIGHT, z);
+            scene.camera.lookAt(ORBIT_CENTER);
+        }
+
+        function carveBurrowInGrid(bx, bz, radius) {
+            const centerC = cardGridCX(bx);
+            const centerR = cardGridCZ(bz);
+            const rBlocks = Math.ceil(radius / CARD_BLOCK);
+            for (let l = CARD_SURFACE; l < CARD_BEDROCK_LAYER; l++) {
+                for (let dr = -rBlocks; dr <= rBlocks; dr++) {
+                    for (let dc = -rBlocks; dc <= rBlocks; dc++) {
+                        const rr = centerR + dr;
+                        const cc = centerC + dc;
+                        if (rr < 0 || rr >= CARD_ROWS || cc < 0 || cc >= CARD_COLS) continue;
+                        const dx = cardWorldX(cc) - bx;
+                        const dz = cardWorldZ(rr) - bz;
+                        if (dx * dx + dz * dz <= radius * radius) {
+                            cardSetTile(cc, rr, l, CARD_AIR);
+                        }
+                    }
+                }
+            }
+            cardRebuildBlocks();
+        }
+
         // Audio: BoppersPlayer drives timing/analyzer; SoundfontPlayer provides real samples
         const audioEl = document.getElementById('boppersAudio');
         audioEl.volume = 0;
@@ -341,7 +475,7 @@
                 opacity: 0.6
             });
             const bar = new THREE.Mesh(barGeo, barMat);
-            bar.position.set(-28 + i * 3.6, -2, -34);
+            bar.position.set(-28 + i * 3.6, CARD_SURFACE_Y, -38);
             scene.scene.add(bar);
             soundBars.push(bar);
         }
@@ -436,15 +570,16 @@
             }
         }
 
-        layoutWord('HAPPY', '#00d4aa', 8, 0);
-        layoutWord('87TH', '#ffd700', 4, 0);
-        layoutWord('BIRTHDAY', '#e94560', 0, 0);
-        layoutWord('HARRY', '#4285f4', -1, 0);
+        // Letter cubes sit on the grass surface and stack upward
+        layoutWord('HAPPY', '#00d4aa', 11.9, 0);
+        layoutWord('87TH', '#ffd700', 8.3, 0);
+        layoutWord('BIRTHDAY', '#e94560', 4.7, 0);
+        layoutWord('HARRY', '#4285f4', 1.1, 0);
 
-        // Ladders — stored in a visible rack on the platform edge
+        // Ladders — stored in a visible rack on the grass edge
         const ladders = [];
-        const LADDER_BOTTOM = -1;
-        const LADDER_TOP = 8.5;
+        const LADDER_BOTTOM = CARD_SURFACE_Y;
+        const LADDER_TOP = 13.5;
         const LADDER_STASH = { x: 25, z: 0 };
         const WORLD_RADIUS = 24;
 
@@ -488,7 +623,7 @@
             // Base platform
             const baseGeo = new THREE.BoxGeometry(6, 0.4, 5);
             const base = new THREE.Mesh(baseGeo, frameMat);
-            base.position.y = -1.1;
+            base.position.y = CARD_SURFACE_Y - 0.2;
             group.add(base);
             // Vertical posts
             const postGeo = new THREE.BoxGeometry(0.25, 4.5, 0.25);
@@ -658,7 +793,7 @@
 
             // Scale up so Harry is clearly bigger than the wombats
             group.scale.set(1.6, 1.6, 1.6);
-            group.position.set(16, -1.1, 6);
+            group.position.set(16, CARD_SURFACE_Y, 6);
             group.rotation.y = -0.4;
             scene.root.add(group);
             return group;
@@ -685,10 +820,10 @@
 
         // Confetti
         const confetti = [];
-        const FLOOR_Y = -1.0;
-        const WOMBAT_MIN_Y = -0.7;
+        const FLOOR_Y = CARD_SURFACE_Y;
+        const WOMBAT_MIN_Y = CARD_SURFACE_Y;
         const WOMBAT_ROTATION_OFFSET = Math.PI; // flip STL so nose points forward
-        const WOMBAT_MAX_Y = 8.5;
+        const WOMBAT_MAX_Y = LADDER_TOP;
         const colors = [0x00d4aa, 0xe94560, 0xfbbc04, 0x4285f4, 0x9c27b0];
         const confettiGeo = new THREE.BoxGeometry(0.3, 0.3, 0.3);
         function spawnConfetti() {
@@ -716,43 +851,11 @@
         const ringMat = new THREE.MeshBasicMaterial({ color: 0x00d4aa, side: THREE.DoubleSide });
         const ring = new THREE.Mesh(ringGeo, ringMat);
         ring.rotation.x = -Math.PI / 2;
-        ring.position.set(0, -1.2, 0);
+        ring.position.set(0, CARD_SURFACE_Y - 0.05, 0);
         scene.root.add(ring);
 
-        // Ground plane (sub-floor, far below)
-        const groundGeo = new THREE.PlaneGeometry(120, 80);
-        const groundMat = new THREE.MeshStandardMaterial({ color: 0x0a0a18, roughness: 1.0, metalness: 0.0 });
-        const ground = new THREE.Mesh(groundGeo, groundMat);
-        ground.rotation.x = -Math.PI / 2;
-        ground.position.y = -9.25;
-        scene.root.add(ground);
-
-        // Top surface platform — translucent grid so the burrow cylinders below are visible
-        const platformGeo = new THREE.BoxGeometry(70, 0.3, 45);
-        const platformMat = new THREE.MeshStandardMaterial({
-            color: 0x5c7a52,
-            roughness: 0.95,
-            metalness: 0.0,
-            transparent: true,
-            opacity: 0.35
-        });
-        const platform = new THREE.Mesh(platformGeo, platformMat);
-        platform.position.set(0, -1.15, 0);
-        scene.root.add(platform);
-
-        // Grid lines on top of the platform for depth/spatial reference
-        const gridHelper = new THREE.GridHelper(70, 35, 0x88aa77, 0x5c7a52);
-        gridHelper.position.set(0, -0.98, 0);
-        gridHelper.material.transparent = true;
-        gridHelper.material.opacity = 0.35;
-        scene.root.add(gridHelper);
-
-        // Sub-floor discs under each burrow hole (visual connectors)
-        const subFloorGeo = new THREE.CylinderGeometry(32, 32, 0.6, 64);
-        const subFloorMat = new THREE.MeshStandardMaterial({ color: 0x2a1d16, roughness: 1.0 });
-        const subFloor = new THREE.Mesh(subFloorGeo, subFloorMat);
-        subFloor.position.set(0, -9.25, 0);
-        scene.root.add(subFloor);
+        // Voxel ground with grass surface, dirt layers, and bedrock floor
+        initCardGround();
 
         // Beat rings pool
         const beatRings = [];
@@ -770,7 +873,7 @@
                 br.mesh.rotation.x = -Math.PI / 2;
                 scene.root.add(br.mesh);
             }
-            br.mesh.position.set(x || 0, -1.15, z || 0);
+            br.mesh.position.set(x || 0, CARD_SURFACE_Y + 0.02, z || 0);
             br.mesh.scale.set(1, 1, 1);
             br.mesh.material.opacity = 0.85;
             br.birth = player.currentTime;
@@ -781,72 +884,41 @@
         const burrows = [];
 
         function makeBurrow(x, z, idx) {
-            const group = new THREE.Group();
-            const depth = 8.0;
             const radius = 2.6;
+            const depth = 8.0;
 
-            // Tall dirt cylinder: rises above the platform so it's impossible to miss
-            const cylinderHeight = depth + 2.5;
-            const cylinderGeo = new THREE.CylinderGeometry(radius, radius * 0.8, cylinderHeight, 32, 1, true);
-            const cylinderMat = new THREE.MeshStandardMaterial({
-                color: 0xc69c6d,
-                roughness: 0.85,
-                metalness: 0.05,
-                side: THREE.DoubleSide,
-                transparent: true,
-                opacity: 0.95,
-                emissive: 0x8d6e63,
-                emissiveIntensity: 0.35
-            });
-            const cylinder = new THREE.Mesh(cylinderGeo, cylinderMat);
-            cylinder.position.y = -1.0 - depth / 2;
-            group.add(cylinder);
+            // Carve the hole out of the voxel ground
+            carveBurrowInGrid(x, z, radius);
 
-            // Bright rim ring at platform level
-            const glowGeo = new THREE.RingGeometry(radius - 0.05, radius + 0.15, 32);
-            const glowMat = new THREE.MeshBasicMaterial({ color: 0xffd54f, side: THREE.DoubleSide, transparent: true, opacity: 0.9 });
-            const glow = new THREE.Mesh(glowGeo, glowMat);
-            glow.rotation.x = -Math.PI / 2;
-            glow.position.y = -0.95;
-            group.add(glow);
-
-            // Dark bottom cap
-            const capGeo = new THREE.CircleGeometry(radius * 0.8, 32);
-            const capMat = new THREE.MeshBasicMaterial({ color: 0x1a1008 });
-            const cap = new THREE.Mesh(capGeo, capMat);
-            cap.rotation.x = Math.PI / 2;
-            cap.position.y = -1.0 - depth;
-            group.add(cap);
-
-            // Dirt rim around the hole
+            // Decorative rim ring at the grass surface
+            const group = new THREE.Group();
             const rimGeo = new THREE.RingGeometry(radius, radius + 0.9, 32);
             const rimMat = new THREE.MeshBasicMaterial({ color: 0xc69c6d, side: THREE.DoubleSide });
             const rim = new THREE.Mesh(rimGeo, rimMat);
             rim.rotation.x = -Math.PI / 2;
-            rim.position.y = -1.0;
+            rim.position.y = CARD_SURFACE_Y + 0.02;
             rim.scale.set(0, 0, 0);
             group.add(rim);
 
-            // Raised mound around rim
-            const moundGeo = new THREE.TorusGeometry(radius + 0.55, 0.3, 8, 32);
-            const moundMat = new THREE.MeshStandardMaterial({ color: 0xa1887f, roughness: 1.0 });
-            const mound = new THREE.Mesh(moundGeo, moundMat);
-            mound.rotation.x = -Math.PI / 2;
-            mound.position.y = -1.0;
-            mound.scale.set(0, 0, 0);
-            group.add(mound);
+            // Bright glow ring at the edge
+            const glowGeo = new THREE.RingGeometry(radius - 0.05, radius + 0.15, 32);
+            const glowMat = new THREE.MeshBasicMaterial({ color: 0xffd54f, side: THREE.DoubleSide, transparent: true, opacity: 0.9 });
+            const glow = new THREE.Mesh(glowGeo, glowMat);
+            glow.rotation.x = -Math.PI / 2;
+            glow.position.y = CARD_SURFACE_Y + 0.03;
+            group.add(glow);
 
             group.position.set(x, 0, z);
             scene.root.add(group);
 
             const burrow = {
-                group, cylinder, glow, rim, mound, cap,
+                group, rim, glow,
                 x, z,
                 radius,
                 depth,
-                dug: false,
+                dug: true,
                 stored: [],
-                opening: null,
+                opening: 0,
                 idx,
                 maxCubes: 4,
                 isFull() { return this.stored.length >= this.maxCubes; }
@@ -1303,9 +1375,9 @@
                     this.carrying.userData.state = 'stored';
                     this.carrying.userData.storedIn = b;
                     this.carrying.userData.carrier = null;
-                    // Stack cubes inside the burrow cylinder from the bottom up
+                    // Stack cubes inside the burrow from the bottom up (on top of the layer above bedrock)
                     const cubeSize = 2.0;
-                    const floor = -1.0 - b.depth + cubeSize / 2;
+                    const floor = cardWorldY(CARD_BEDROCK_LAYER - 1) + CARD_BLOCK / 2 + cubeSize / 2;
                     const index = b.stored.length - 1;
                     const y = floor + index * (cubeSize * 0.9);
                     const angle = index * 0.7;
@@ -1385,6 +1457,16 @@
               .on('play', () => { playBtn.textContent = '⏸ Pause'; })
               .on('ended', () => { playBtn.textContent = 'Replay'; });
 
+        // Orbit camera controls
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') ORBIT_KEYS.left = true;
+            if (e.key === 'ArrowRight') ORBIT_KEYS.right = true;
+        });
+        window.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowLeft') ORBIT_KEYS.left = false;
+            if (e.key === 'ArrowRight') ORBIT_KEYS.right = false;
+        });
+
         function updateLetters(t) {
             const elapsed = Math.max(0, t);
             letters.forEach((letter) => {
@@ -1439,8 +1521,8 @@
                 if (typeof b.opening === 'number') {
                     b.opening += dt * 3;
                     const s = Math.min(1, b.opening);
-                    b.rim.scale.set(s, s, s);
-                    b.mound.scale.set(s, s, s);
+                    if (b.rim) b.rim.scale.set(s, s, s);
+                    if (b.glow) b.glow.scale.set(s, s, s);
                     if (s >= 1) b.opening = null;
                 }
             });
@@ -1645,11 +1727,10 @@
             const pulse = 1 + Math.sin(wallTime * 3) * 0.08;
             ring.scale.set(pulse, pulse, pulse);
 
-            // Camera drift — pulled back and lowered so the bottom row ('HARRY') stays readable
-            scene.camera.position.x = Math.sin(wallTime * 0.12) * 2;
-            scene.camera.position.y = 5 + Math.cos(wallTime * 0.08) * 0.5;
-            scene.camera.position.z = 34;
-            scene.camera.lookAt(0, 2, 0);
+            // Camera orbit — arrow keys spin around the voxel ground edges
+            if (ORBIT_KEYS.left) orbitAngle -= 1.5 * dt;
+            if (ORBIT_KEYS.right) orbitAngle += 1.5 * dt;
+            updateOrbitCamera();
 
             scene.render();
         }
