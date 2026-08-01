@@ -4,7 +4,9 @@ A browser-based 3D birthday card built for Harry Baya. It features real wombat m
 
 ## Live Demo
 
-Open `index.html` in a modern browser (Chrome works best; Brave may need Shields down for WebGL).
+Play it live at: https://phred.boppers.net/harrys-birthday-2026/
+
+Or open `index.html` in a modern browser (Chrome works best; Brave may need Shields down for WebGL).
 
 ## What's Inside
 
